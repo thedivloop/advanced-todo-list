@@ -537,3 +537,5 @@ User personas help you understand your users' needs and behaviors.
 # References
 
 ## Resources
+
+Django Test Driven Development [video](https://www.youtube.com/watch?v=REhBTwubGzo&t=187s)
