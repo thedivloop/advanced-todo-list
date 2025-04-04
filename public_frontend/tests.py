@@ -35,3 +35,4 @@ class FeaturesPageTest(TestCase):
   def test_features_page_has_correct_title(self):
     response = self.client.get('/features/')
     self.assertContains(response, '<title>Atlas Features</title>')
+
