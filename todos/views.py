@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from .forms import NewTodoForm, UpdateTodoForm
 from .models import Todo
@@ -7,7 +9,7 @@ from .models import Todo
 
 def index(request):
   todos = Todo.objects.all()
-  return render(request, 'todos/index.html', {'todos': todos})
+  return render(request, 'todos/index.html', {'todos': todos, 'current_path': request.path})
 
 def detail(request, pk):
   todo = Todo.objects.get(pk=pk)
@@ -19,8 +21,7 @@ def new(request):
 
     if form.is_valid():
       form.save()
-
-      return redirect('/')
+      return HttpResponseRedirect(reverse("index"))
   else:
     form = NewTodoForm()
 
@@ -33,7 +34,7 @@ def update(request,pk):
 
     if form.is_valid():
       form.save()
-      return redirect('/')
+      return HttpResponseRedirect(reverse("index"))
   else:
     form = UpdateTodoForm(instance=todo)
   return render(request, 'todos/update.html', { 'form' : form })
@@ -42,4 +43,4 @@ def delete(request,pk):
   todo = Todo.objects.get(pk=pk)
   if request.method == 'POST':
     todo.delete()
-    return redirect('/')
+    return HttpResponseRedirect(reverse("index"))
