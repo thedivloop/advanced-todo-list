@@ -3,6 +3,7 @@ from unittest import skip
 
 # Create your tests here.
 
+""" Test templates rendering """
 class IndexPageTest(TestCase):
   def test_index_page_returns_correct_response(self):
     response = self.client.get('/')
@@ -35,4 +36,7 @@ class FeaturesPageTest(TestCase):
   def test_features_page_has_correct_title(self):
     response = self.client.get('/features/')
     self.assertContains(response, '<title>Atlas Features</title>')
+
+
+""" Test pages functionality """
 

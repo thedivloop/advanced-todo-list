@@ -91,7 +91,7 @@ class NewPageTest(TestCase):
     })
 
 
-    self.assertContains(response,'<ul class="errorlist">')
+    self.assertContains(response,'<ul class="errorlist"')
     self.assertContains(response,'This field is required.')
 
     # test valid form
@@ -155,7 +155,7 @@ class UpdatePageTest(TestCase):
     }, instance = self.todo)
 
 
-    self.assertContains(response,'<ul class="errorlist">')
+    self.assertContains(response,'<ul class="errorlist"')
     self.assertContains(response,'This field is required.')
 
     # test valid form
