@@ -16,13 +16,17 @@ def login_view(request):
     if form.is_valid():
         user = form.get_user()
         login(request, user)
-        return render(request, 'users/dashboard.html')
+        # return render(request, 'users/dashboard.html')
+        return HttpResponseRedirect(reverse("users:dashboard"))
     else:
         return render(request, 'users/login.html', {'form': form})
   return render(request, 'users/login.html', {'form': AuthenticationForm()})
 
 def register_view(request):
   return render(request, 'users/register.html')
+
+def dashboard_view(request):
+  return render(request, 'users/dashboard.html')
 
 def logout_view(request):
   logout(request)

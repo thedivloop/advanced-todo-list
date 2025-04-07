@@ -53,16 +53,16 @@ class LoginPageTest(TestCase):
     # Check if login form exists
     self.assertTrue(self.driver.find_element(By.NAME, "username"))
     self.assertTrue(self.driver.find_element(By.NAME, "password"))
-    self.assertTrue(self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']"))
+    self.assertTrue(self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']"))
   
   def test_login_valid_credentials(self):
     self.driver.get("http://127.0.0.1:8000/login/")
     self.driver.find_element(By.NAME, "username").send_keys("babyman")
     self.driver.find_element(By.NAME, "password").send_keys("!@#$%^&*()")
-    self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 2)
     # Assert that after login, the user is redirected to the home page
-    # self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/dashboard/")
+    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/dashboard/")
     self.assertIn('<h1>Dashboard</h1>',self.driver.page_source)
     self.assertIn('<a href="/logout',self.driver.page_source)
 
@@ -78,7 +78,7 @@ class LogoutPageTest(TestCase):
     self.driver.get("http://127.0.0.1:8000/login/")
     self.driver.find_element(By.NAME, "username").send_keys("babyman")
     self.driver.find_element(By.NAME, "password").send_keys("!@#$%^&*()")
-    self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     logout_button = WebDriverWait(self.driver, 2).until(EC.element_to_be_clickable((By.LINK_TEXT, "Logout")))
     logout_button.click()
     # self.driver.find_element(By.LINK_TEXT,"Logout").click()
