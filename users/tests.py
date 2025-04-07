@@ -6,6 +6,7 @@ from django.apps import apps
 # app_name = f'{apps.get_containing_app_config(__name__).name}/'
 
 class LoginPageTest(TestCase):
+
   def test_login_page_returns_correct_response(self):
     response = self.client.get('/login/')
 
@@ -17,6 +18,7 @@ class LoginPageTest(TestCase):
     self.assertContains(response, '<title>Atlas Login</title>')
 
 class RegisterPageTest(TestCase):
+
   def test_register_page_returns_correct_response(self):
     response = self.client.get('/register/')
 
@@ -26,3 +28,10 @@ class RegisterPageTest(TestCase):
   def test_register_page_has_correct_title(self):
     response = self.client.get('/register/')
     self.assertContains(response, '<title>Atlas Register</title>')
+
+class DashboardPageTest(TestCase):
+
+  def test_redirection_to_loginpage_ifnot_loggedin(self):
+    response = self.client.get('/dashboard/')
+    self.assertEqual(response.status_code, 302)
+    self.assertRedirects(response, '/login/?next=/dashboard/')  

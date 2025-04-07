@@ -98,6 +98,14 @@ class LogoutPageTest(TestCase):
   def tearDown(self):
     self.driver.quit()
 
+class DashboardPageTest(TestCase):
+  def setUp(self):
+    self.driver = webdriver.Chrome(options=options)
+
+  def test_redirection_to_loginpage_ifnot_loggedin(self):
+    self.driver.get("http://127.0.0.1:8000/dashboard/")
+    WebDriverWait(self.driver, 2)
+    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/login/?next=/dashboard/")
 
 if __name__ == "__main__":
   main()
