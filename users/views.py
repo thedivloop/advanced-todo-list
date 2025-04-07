@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib import auth
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 
@@ -20,6 +20,9 @@ def login_view(request):
         return HttpResponseRedirect(reverse("users:dashboard"))
     else:
         return render(request, 'users/login.html', {'form': form})
+  user = auth.get_user(request)
+  if user.is_authenticated:
+    return HttpResponseRedirect(reverse("users:dashboard"))
   return render(request, 'users/login.html', {'form': AuthenticationForm()})
 
 def register_view(request):
