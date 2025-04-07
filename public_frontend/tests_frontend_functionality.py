@@ -66,6 +66,16 @@ class LoginPageTest(TestCase):
     self.assertIn('<h1>Dashboard</h1>',self.driver.page_source)
     self.assertIn('<a href="/logout',self.driver.page_source)
 
+  def test_login_invalid_credentials(self):
+    self.driver.get("http://127.0.0.1:8000/login/")
+    self.driver.find_element(By.NAME, "username").send_keys("b")
+    self.driver.find_element(By.NAME, "password").send_keys("!@#$")
+    self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
+    WebDriverWait(self.driver, 2)
+    # Assert that after login, the user is redirected to the home page
+    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/login/")
+    self.assertIn('<ul class="errorlist nonfield">',self.driver.page_source)
+
   def tearDown(self):
     self.driver.quit()
 
