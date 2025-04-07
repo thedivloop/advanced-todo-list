@@ -16,7 +16,6 @@ def login_view(request):
     if form.is_valid():
         user = form.get_user()
         login(request, user)
-        # return render(request, 'users/dashboard.html')
         return HttpResponseRedirect(reverse("users:dashboard"))
     else:
         return render(request, 'users/login.html', {'form': form})
