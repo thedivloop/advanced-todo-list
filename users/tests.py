@@ -5,64 +5,67 @@ from django.test import TestCase
 from django.urls import reverse
 from django.apps import apps
 from users.apps import UsersConfig
-# from unittest import skip
-# from django.apps import apps
+from common.constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, LOGOUT_URL, LOGIN_TEMPLATE, REGISTER_TEMPLATE
+
 # Create your tests here.
 
-# app_name = f'{apps.get_containing_app_config(__name__).name}/'
+app_name = 'users'
+
+def create_test_user(username='testuser', password='testpass123'):
+  return User.objects.create_user(username=username, password=password)
+
 
 class UsersAppConfigTest(TestCase):
-  
+
   def test_users_app_config(self):
-    app_config = apps.get_app_config('users')
+    app_config = apps.get_app_config(app_name)
     assert isinstance(app_config, UsersConfig)
-    assert app_config.name == 'users'
+    assert app_config.name == app_name
 
 class LoginPageTest(TestCase):
 
+  def setUp(self):
+    create_test_user()
+
   def test_login_get_request_renders_form(self):
-    response = self.client.get(reverse("users:login"))
+    response = self.client.get(LOGIN_URL)
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed(response, 'users/login.html')
+    self.assertTemplateUsed(response, LOGIN_TEMPLATE)
     self.assertContains(response, '<form')
     self.assertContains(response, 'username')
     self.assertContains(response, 'password')
     self.assertContains(response, '<title>Atlas Login</title>')
 
   def test_login_post_valid_credentials_redirects_to_dashboard(self):
-    # Create a user first
-    User.objects.create_user(username='testuser', password='testpass123')
-
-    response = self.client.post(reverse('users:login'), {
+    response = self.client.post(LOGIN_URL, {
         'username': 'testuser',
         'password': 'testpass123'
     })
-    self.assertRedirects(response, reverse('users:dashboard'))
+    self.assertRedirects(response, DASHBOARD_URL)
 
     # Optionally confirm user is authenticated
     user = auth.get_user(self.client)
     self.assertTrue(user.is_authenticated)
 
   def test_login_post_invalid_credentials_shows_errors(self):
-    response = self.client.post(reverse('users:login'), {
+    response = self.client.post(LOGIN_URL, {
         'username': 'wrong',
         'password': 'wrongpass'
     })
 
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed(response, 'users/login.html')
+    self.assertTemplateUsed(response, LOGIN_TEMPLATE)
     self.assertContains(response, '<ul class="errorlist')
 
   def test_authenticated_user_access_login_redirects(self):
-    User.objects.create_user(username='testuser', password='testpass123')
     self.client.login(username='testuser', password='testpass123')
 
-    response = self.client.get(reverse('users:login'))
-    self.assertRedirects(response, reverse('users:dashboard'))  
+    response = self.client.get(LOGIN_URL)
+    self.assertRedirects(response, DASHBOARD_URL)
 
   def test_login_post_without_csrf_token_should_fail(self):
     client = Client(enforce_csrf_checks=True)
-    response = client.post(reverse('users:login'), {
+    response = client.post(LOGIN_URL, {
         'username': 'testuser',
         'password': 'testpass123'
     })
@@ -72,11 +75,12 @@ class LoginPageTest(TestCase):
 
 
 class RegisterPageTest(TestCase):
+  
 
   def test_register_page_renders_form(self):
-    response = self.client.get(reverse('users:register'))
+    response = self.client.get(REGISTER_URL)
     self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed(response, 'users/register.html')
+    self.assertTemplateUsed(response, REGISTER_TEMPLATE)
     self.assertContains(response, '<title>Atlas Register</title>')
     self.assertContains(response, '<form')
     self.assertContains(response, 'name="username"')
@@ -84,17 +88,17 @@ class RegisterPageTest(TestCase):
     self.assertContains(response, 'name="password2"')
 
   def test_valid_user_registration_creates_user_and_redirects(self):
-    response = self.client.post(reverse('users:register'), {
+    response = self.client.post(REGISTER_URL, {
       'username': 'newuser',
       'password1': 'SuperSecret123',
       'password2': 'SuperSecret123'
     })
 
-    self.assertRedirects(response, reverse('users:dashboard'))
+    self.assertRedirects(response, DASHBOARD_URL)
     self.assertTrue(User.objects.filter(username='newuser').exists())
 
   def test_register_with_mismatched_passwords_shows_error(self):
-    response = self.client.post(reverse('users:register'), {
+    response = self.client.post(REGISTER_URL, {
         'username': 'newuser',
         'password1': 'PasswordOne123',
         'password2': 'PasswordTwo123'
@@ -106,7 +110,7 @@ class RegisterPageTest(TestCase):
   def test_register_with_existing_username_fails(self):
     User.objects.create_user(username='existing', password='SomePass123')
 
-    response = self.client.post(reverse('users:register'), {
+    response = self.client.post(REGISTER_URL, {
         'username': 'existing',
         'password1': 'AnotherPass123',
         'password2': 'AnotherPass123'
@@ -115,11 +119,11 @@ class RegisterPageTest(TestCase):
     self.assertContains(response, "A user with that username already exists")
 
   def test_register_form_has_csrf_token(self):
-    response = self.client.get(reverse('users:register'))
+    response = self.client.get(REGISTER_URL)
     self.assertContains(response, 'csrfmiddlewaretoken')
 
   def test_password_too_weak_is_rejected(self):
-    response = self.client.post(reverse('users:register'), {
+    response = self.client.post(REGISTER_URL, {
       'username': 'weakpassuser',
       'password1': '123',
       'password2': '123'
@@ -128,12 +132,15 @@ class RegisterPageTest(TestCase):
     self.assertContains(response, "This password is too short")
 
 class LogoutPageTest(TestCase):
+
+  def setUp(self):
+    create_test_user()
+
   def test_logout_redirects_to_login(self):
-    User.objects.create_user(username='testuser', password='testpass123')
     self.client.login(username='testuser', password='testpass123')
 
-    response = self.client.get(reverse('users:logout'))
-    self.assertRedirects(response, reverse('users:login'))
+    response = self.client.get(LOGOUT_URL)
+    self.assertRedirects(response, LOGIN_URL)
 
     # Check if user is logged out
     user = auth.get_user(self.client)
