@@ -1,15 +1,15 @@
-from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.contrib import auth
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+
 
 # Create your views here.
 
-def index(request):
-  return render(request, 'users/index.html')
+# def index(request):
+#   return render(request, 'users/index.html')
 
 def login_view(request):
   if request.method == 'POST':
@@ -17,16 +17,26 @@ def login_view(request):
     if form.is_valid():
         user = form.get_user()
         login(request, user)
-        return HttpResponseRedirect(reverse("users:dashboard"))
+        return redirect("users:dashboard")
     else:
         return render(request, 'users/login.html', {'form': form})
   user = auth.get_user(request)
   if user.is_authenticated:
-    return HttpResponseRedirect(reverse("users:dashboard"))
+    return redirect("users:dashboard")
   return render(request, 'users/login.html', {'form': AuthenticationForm()})
 
 def register_view(request):
-  return render(request, 'users/register.html')
+  if request.method == 'POST':
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+      user = form.save()
+      login(request, user)
+      return redirect(reverse("users:dashboard"))
+  else:
+    form = UserCreationForm()
+    form.errors.clear()
+  return render(request, 'users/register.html', {'form': form})
+
 
 @login_required
 def dashboard_view(request):
@@ -34,7 +44,7 @@ def dashboard_view(request):
 
 def logout_view(request):
   logout(request)
-  return HttpResponseRedirect(reverse("users:login"))
+  return redirect("users:login")
 
 # Create your views here.
 """
