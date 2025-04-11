@@ -1,0 +1,78 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+*.log
+*.pot
+*.py[cod]
+
+# Django
+*.log
+*.pot
+*.mo
+*.sqlite3
+db.sqlite3
+/media
+/static
+/staticfiles
+*.log
+
+# Environment variables and config files
+.env
+.env.*
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Coverage reports
+.coverage
+.coverage.*
+*.coveragerc
+nosetests.xml
+coverage.xml
+*.hypothesis/
+
+# Django migrations
+*/migrations/*
+
+# pytest
+.cache
+*.pytest_cache/
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# pyenv
+.python-version
+
+# mypy
+.mypy_cache/
+
+# Celery beat schedule file
+celerybeat-schedule*
+
+# Docker
+docker-compose.override.yml
+
+# Local configuration
+local_settings.py
