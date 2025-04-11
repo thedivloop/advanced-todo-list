@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 	</head>
 	<body>
+    <div class="main-container">
 		<header>
 			{% block header %}
 			<nav>
@@ -26,5 +27,6 @@
 			{% endblock %}
 		</header>
 		<main>{% block content %} {% endblock %}</main>
+  </div>
 	</body>
 </html>
