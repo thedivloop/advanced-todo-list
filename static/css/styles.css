@@ -1,0 +1,87 @@
+
+body {
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  width: 80%;
+  margin: 0 auto;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+}
+header {
+  margin-top: 2rem;
+  /* position: sticky; */
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  
+}
+ul {
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+ul li {
+  margin: 0 15px;
+}
+
+a {
+  text-decoration: none;
+  text-transform: uppercase;
+  color: #738883;
+}
+
+.active-page {
+  color: #3CD4B3;
+}
+
+.app-access li {
+  border:#3CD4B3 solid 2px;
+  border-radius: 1.2rem;
+  padding: 15px;
+  font-weight: bold;
+}
+
+.app-access li a {
+  text-decoration: none;
+}
+
+.login-button {
+  background-color: #3CD4B3;
+  cursor: pointer;
+}
+
+.login-button > a {
+  color: white;
+}
+
+.login-button:hover {
+  background-color: white;
+}
+
+.login-button:hover > a {
+  color: #3CD4B3;
+}
+
+.register-button > a {
+  color: #3CD4B3;
+}
+
+.register-button:hover {
+  background-color: #3CD4B3;
+}
+
+.register-button:hover > a {
+  color: white;
+}
+
+
+
+h1 {
+  color: #738883;
+}
