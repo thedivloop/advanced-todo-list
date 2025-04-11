@@ -107,5 +107,5 @@ class DashboardPageTest(TestCase):
     WebDriverWait(self.driver, 2)
     self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/login/?next=/dashboard/")
 
-if __name__ == "__main__":
-  main()
+# if __name__ == "__main__":
+#   main()

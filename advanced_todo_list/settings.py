@@ -20,8 +20,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
-    'public_frontend',
-    'todos',
+    'public_frontend.apps.PublicFrontendConfig',
+    'todos.apps.TodosConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

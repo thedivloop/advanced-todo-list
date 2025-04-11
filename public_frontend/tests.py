@@ -1,7 +1,18 @@
 from django.test import TestCase
 from unittest import skip
+from public_frontend.apps import PublicFrontendConfig
+from django.apps import apps
 
 # Create your tests here.
+
+app_name = 'public_frontend'
+
+class FrontendAppConfigTest(TestCase):
+
+  def test_todos_app_config(self):
+    app_config = apps.get_app_config(app_name)
+    assert isinstance(app_config, PublicFrontendConfig)
+    assert app_config.name == app_name
 
 """ Test templates rendering """
 class IndexPageTest(TestCase):
