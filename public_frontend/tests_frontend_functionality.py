@@ -27,17 +27,17 @@ class WebPageTests(TestCase):
     self.assertEqual(self.driver.title,"Atlas Homepage")
 
   def test_link_to_register_page(self):
-    link_register = self.driver.find_element(By.LINK_TEXT,"Register")
+    link_register = self.driver.find_element(By.LINK_TEXT,"REGISTER")
     link_register.click()
     self.assertEqual(self.driver.title,"Atlas Register")
   
   def test_link_to_login_page(self):
-    link_login = self.driver.find_element(By.LINK_TEXT,"Login")
+    link_login = self.driver.find_element(By.LINK_TEXT,"LOGIN")
     link_login.click()
     self.assertEqual(self.driver.title,"Atlas Login")
 
   def test_content_login_page(self):
-    link_login = self.driver.find_element(By.LINK_TEXT,"Login")
+    link_login = self.driver.find_element(By.LINK_TEXT,"LOGIN")
     link_login.click()
     self.assertIn('<h1>Login</h1>',self.driver.page_source)
 
@@ -71,7 +71,7 @@ class LoginPageTest(TestCase):
     self.driver.find_element(By.NAME, "username").send_keys("b")
     self.driver.find_element(By.NAME, "password").send_keys("!@#$")
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
-    WebDriverWait(self.driver, 2)
+    WebDriverWait(self.driver, 4)
     # Assert that after login, the user is redirected to the home page
     self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/login/")
     self.assertIn('<ul class="errorlist nonfield">',self.driver.page_source)

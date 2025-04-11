@@ -1,3 +1,6 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
 .main-container {
   display: flex;
@@ -11,7 +14,7 @@
 header {
   position: fixed;
   width: 80%;
-  padding-top: 2rem;
+  padding: 2rem 0rem;
   background-color: white;
   top:0;
 }
@@ -23,13 +26,13 @@ nav {
   padding: 10px;
   
 }
-ul {
+nav > ul {
   display: flex;
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-ul li {
+nav > ul > li {
   margin: 0 15px;
 }
 
@@ -88,9 +91,75 @@ a {
 main {
   margin-top: 100px;
   padding: 20px;
-  /* border-radius: 10px; */
+}
+
+.modal-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px; */
 }
 
 h1 {
   color: #738883;
+}
+
+.helptext, .errorlist, form > ul {
+  display: block;
+  font-style: italic;
+  color: rgb(215, 100, 100);
+  font-size: 0.8em;
+}
+
+form {
+  background-color: white;
+  padding: 2rem 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 400px;
+}
+
+form h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+form div {
+  width: 100%;
+  margin-bottom: 1.2rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input[type="submit"] {
+  background-color: #3CD4B3;
+  color: white;
+  padding: 0.7rem;
+  display: block;
+  width: 100%;
+  border: #3CD4B3 solid 2px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+input[type="submit"]:hover {
+  color: #3CD4B3;
+  background-color: white;
 }
