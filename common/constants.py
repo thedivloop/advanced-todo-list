@@ -7,3 +7,9 @@ LOGOUT_URL = reverse('users:logout')
 
 LOGIN_TEMPLATE = 'users/login.html'
 REGISTER_TEMPLATE = 'users/register.html'
+
+MENU_LIST = [{'name': 'Home','uri': '/'}, 
+             {'name': 'Features','uri': '/features/'}, 
+             {'name': 'About','uri': '/about/'}, 
+             {'name': 'Login','uri': LOGIN_URL}, 
+             {'name': 'Register','uri': REGISTER_URL}]

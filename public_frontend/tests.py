@@ -2,6 +2,7 @@ from django.test import TestCase
 from unittest import skip
 from public_frontend.apps import PublicFrontendConfig
 from django.apps import apps
+from common.constants import MENU_LIST
 
 # Create your tests here.
 
@@ -28,11 +29,8 @@ class IndexPageTest(TestCase):
 
   def test_index_page_has_correct_menu(self):
     response = self.client.get('/')
-    self.assertContains(response, '<a href="/">Home</a>')
-    self.assertContains(response, '<a href="/features/">Features</a>')
-    self.assertContains(response, '<a href="/about/">About</a>')
-    self.assertContains(response, '<a href="/login/">Login</a>')
-    self.assertContains(response, '<a href="/register/">Register</a>')
+    for menu in MENU_LIST:
+      self.assertContains(response, f'href="{menu["uri"]}">{menu["name"]}')
 
 
 class AboutPageTest(TestCase):
@@ -48,11 +46,8 @@ class AboutPageTest(TestCase):
   
   def test_about_page_has_correct_menu(self):
     response = self.client.get('/about/')
-    self.assertContains(response, '<a href="/">Home</a>')
-    self.assertContains(response, '<a href="/features/">Features</a>')
-    self.assertContains(response, '<a href="/about/">About</a>')
-    self.assertContains(response, '<a href="/login/">Login</a>')
-    self.assertContains(response, '<a href="/register/">Register</a>')
+    for menu in MENU_LIST:
+      self.assertContains(response, f'href="{menu["uri"]}">{menu["name"]}')
 
 class FeaturesPageTest(TestCase):
   def test_features_page_returns_correct_response(self):
@@ -67,11 +62,8 @@ class FeaturesPageTest(TestCase):
 
   def test_features_page_has_correct_menu(self):
     response = self.client.get('/features/')
-    self.assertContains(response, '<a href="/">Home</a>')
-    self.assertContains(response, '<a href="/features/">Features</a>')
-    self.assertContains(response, '<a href="/about/">About</a>')
-    self.assertContains(response, '<a href="/login/">Login</a>')
-    self.assertContains(response, '<a href="/register/">Register</a>')
+    for menu in MENU_LIST:
+      self.assertContains(response, f'href="{menu["uri"]}">{menu["name"]}')
 
 """ Test pages functionality """
 
