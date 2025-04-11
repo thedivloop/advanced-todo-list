@@ -2,6 +2,8 @@ from django.shortcuts import render
 
 # Create your views here.
 
+app_name = 'public_frontend'
+
 def index(request):
   return render(request, 'public_frontend/index.html')
 

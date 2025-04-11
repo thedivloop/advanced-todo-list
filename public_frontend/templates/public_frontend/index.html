@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Atlas Homepage</title>
-	</head>
-	<body>
-		<h1>Homepage</h1>
-		<a id="login_link" href="{% url 'users:login' %}">Login</a>
-		<a id="register_link" href="{% url 'users:register' %}">Register</a>
-	</body>
-</html>
+{% extends 'public_frontend/layout.html' %} 
+{% block title %}Atlas Homepage{% endblock %} 
+{% block content %}
+<h1>Homepage</h1>
+<p>This is the content of the child template.</p>
+{% endblock %}
