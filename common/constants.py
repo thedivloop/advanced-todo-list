@@ -1,9 +1,10 @@
-from django.urls import reverse
+from django.urls import reverse_lazy
 
-LOGIN_URL = reverse('users:login')
-REGISTER_URL = reverse('users:register')
-DASHBOARD_URL = reverse('users:dashboard')
-LOGOUT_URL = reverse('users:logout')
+LOGIN_URL = reverse_lazy('users:login')
+REGISTER_URL = reverse_lazy('users:register')
+DASHBOARD_URL = reverse_lazy('users:dashboard')
+TODOS_URL = reverse_lazy('todos:index')
+LOGOUT_URL = reverse_lazy('users:logout')
 
 LOGIN_TEMPLATE = 'users/login.html'
 REGISTER_TEMPLATE = 'users/register.html'

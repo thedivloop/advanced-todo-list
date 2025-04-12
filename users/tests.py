@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.apps import apps
 from users.apps import UsersConfig
-from common.constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, LOGOUT_URL, LOGIN_TEMPLATE, REGISTER_TEMPLATE
+from common.constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, LOGOUT_URL, LOGIN_TEMPLATE, REGISTER_TEMPLATE, TODOS_URL
 
 # Create your tests here.
 
@@ -41,7 +41,7 @@ class LoginPageTest(TestCase):
         'username': 'testuser',
         'password': 'testpass123'
     })
-    self.assertRedirects(response, DASHBOARD_URL)
+    self.assertRedirects(response, TODOS_URL)
 
     # Optionally confirm user is authenticated
     user = auth.get_user(self.client)
@@ -61,7 +61,7 @@ class LoginPageTest(TestCase):
     self.client.login(username='testuser', password='testpass123')
 
     response = self.client.get(LOGIN_URL)
-    self.assertRedirects(response, DASHBOARD_URL)
+    self.assertRedirects(response, TODOS_URL)
 
   def test_login_post_without_csrf_token_should_fail(self):
     client = Client(enforce_csrf_checks=True)
@@ -149,6 +149,6 @@ class LogoutPageTest(TestCase):
 class DashboardPageTest(TestCase):
 
   def test_redirection_to_loginpage_ifnot_loggedin(self):
-    response = self.client.get('/dashboard/')
+    response = self.client.get('/todos/')
     self.assertEqual(response.status_code, 302)
-    self.assertRedirects(response, '/login/?next=/dashboard/')  
+    self.assertRedirects(response, '/login/?next=/todos/')  

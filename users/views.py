@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from common.constants import TODOS_URL
 
 
 # Create your views here.
@@ -17,12 +18,12 @@ def login_view(request):
     if form.is_valid():
         user = form.get_user()
         login(request, user)
-        return redirect("users:dashboard")
+        return redirect(TODOS_URL)
     else:
         return render(request, 'users/login.html', {'form': form})
   user = auth.get_user(request)
   if user.is_authenticated:
-    return redirect("users:dashboard")
+    return redirect(TODOS_URL)
   return render(request, 'users/login.html', {'form': AuthenticationForm()})
 
 def register_view(request):
@@ -31,7 +32,7 @@ def register_view(request):
     if form.is_valid():
       user = form.save()
       login(request, user)
-      return redirect(reverse("users:dashboard"))
+      return redirect(reverse(TODOS_URL))
   else:
     form = UserCreationForm()
     form.errors.clear()

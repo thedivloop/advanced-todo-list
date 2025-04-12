@@ -13,17 +13,17 @@
     <div class="main-container">
 		<header>
 			{% block header %}
-			<!-- <nav>
-				<ul>
+			<nav>
+				<!-- <ul>
 					<li><a class="active-page" href="{% url 'public_frontend:index' %}">Home</a></li>
 					<li><a href="{% url 'public_frontend:features' %}">Features</a></li>
 					<li><a href="{% url 'public_frontend:about' %}">About</a></li>
-				</ul>
+				</ul> -->
 				<ul class="app-access">
-					<li class="register-button"><a  href="{% url 'users:register' %}">Register</a></li>
-					<li class="login-button"><a href="{% url 'users:login' %}">Login</a></li>
+					<!-- <li class="register-button"><a  href="{% url 'users:register' %}">Register</a></li> -->
+					<li class="login-button"><a href="{% url 'users:logout' %}">Logout</a></li>
 				</ul>
-			</nav> -->
+			</nav>
 			{% endblock %}
 		</header>
 		<main>{% block content %} {% endblock %}</main>
