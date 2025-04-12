@@ -16,6 +16,11 @@ class TodosAppConfigTest(TestCase):
     assert isinstance(app_config, TodosConfig)
     assert app_config.name == app_name
 
+class LoggedInTestCase(TestCase):
+  def setUp(self):
+    self.user = User.objects.create_user(username='testuser', password='testpassword')
+    self.client.login(username='testuser', password='testpassword')
+
 class TodosModelTest(TestCase):
   def setUp(self):
     self.user = User.objects.create_user(username='testuser', password='testpassword')
@@ -50,9 +55,9 @@ class TodosModelTest(TestCase):
     self.assertEqual(todo.status, "Pending")
     self.assertEqual(todo.user, self.user)
 
-class IndexPageTest(TestCase):
+class IndexPageTest(LoggedInTestCase):
   def setUp(self):
-    self.user = User.objects.create_user(username='testuser', password='testpassword')
+    super().setUp()
     self.todo = Todo.objects.create(title='First todo', user=self.user)
 
   def test_index_page_returns_correct_response(self):
@@ -69,6 +74,7 @@ class IndexPageTest(TestCase):
 class DetailPageTest(TestCase):
   def setUp(self):
     self.user = User.objects.create_user(username='testuser', password='testpassword')
+    self.client.login(username='testuser', password='testpassword')
     self.todo = Todo.objects.create(title='First todo', description='The description', user=self.user)
     self.todo2 = Todo.objects.create(title='Second todo', description='The description', user=self.user)
 
@@ -141,6 +147,7 @@ class UpdatePageTest(TestCase):
   def setUp(self):
     self.user = User.objects.create_user(username='testuser', 
     password='testpass')
+    self.non_owner = User.objects.create_user(username='non_owner', password='password')
     logged_in = self.client.login(username='testuser', password='testpass')
     assert logged_in, "Login failed in test setup"
     self.todo = Todo.objects.create(title='Original Title',
@@ -187,6 +194,14 @@ class UpdatePageTest(TestCase):
     self.assertEqual(self.todo.title, 'Updated Title')
     self.assertEqual(self.todo.description, 'Updated Description')
     self.assertRedirects(response, reverse('todos:index'))
+
+  def test_user_cannot_update_another_user_todo(self):
+    self.client.login(username='non_owner', password='password')
+    response = self.client.post(self.url, self.valid_data)
+    self.assertEqual(response.status_code, 403)
+    todo = Todo.objects.get(id=self.todo.id)
+    self.assertNotEqual(todo.title, self.valid_data['title']) 
+    self.assertNotEqual(todo.description, self.valid_data['description']) 
 
 class DeletePageTest(TestCase):
   def setUp(self):
@@ -236,6 +251,40 @@ class DeletePageTest(TestCase):
     # Ensure that the Todo still exists in the database (i.e., it was not deleted)
     todo_exists = Todo.objects.filter(id=self.todo.id).exists()
     self.assertTrue(todo_exists)
+
+class TodoAccessTest(TestCase):
+  def setUp(self):
+    self.user = User.objects.create_user(username='testuser', password='password')
+    self.todo = Todo.objects.create(
+        title='Test Todo',
+        description='Test description',
+        user=self.user
+    )
+    self.todo_list_url = reverse('todos:index')
+    self.todo_url = reverse('todos:detail', args=[self.todo.id])
+    self.create_url = reverse('todos:new')
+    self.update_url = reverse('todos:update', args=[self.todo.id])
+    self.delete_url = reverse('todos:delete', args=[self.todo.id])
+  
+  def test_access_todo_list_as_unauthenticated_user(self):
+    response = self.client.get(self.todo_list_url)
+    self.assertRedirects(response, f'/login/?next={self.todo_list_url}')
+
+  def test_access_create_todo_as_unauthenticated_user(self):
+    response = self.client.get(self.create_url)
+    self.assertRedirects(response, f'/login/?next={self.create_url}')
+
+  def test_access_todo_detail_as_unauthenticated_user(self):
+    response = self.client.get(self.todo_url)
+    self.assertRedirects(response, f'/login/?next={self.todo_url}')
+
+  def test_access_update_todo_as_unauthenticated_user(self):
+    response = self.client.get(self.update_url)
+    self.assertRedirects(response, f'/login/?next={self.update_url}')
+
+  def test_access_delete_todo_as_unauthenticated_user(self):
+    response = self.client.get(self.delete_url)
+    self.assertRedirects(response, f'/login/?next={self.delete_url}')
 
 class TodoUserAssociationTest(TestCase):
   def setUp(self):

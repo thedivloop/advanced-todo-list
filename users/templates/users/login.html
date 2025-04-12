@@ -5,6 +5,7 @@
   <h1>Login</h1>
   <form method="post">
     {% csrf_token %} {{ form }}
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
     <input type="submit" value="Login"></input>
   </form>
 </div>
