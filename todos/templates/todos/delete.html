@@ -1,0 +1,13 @@
+
+<h1>Are you sure you want to delete this Todo?</h1>
+<p>Title: {{ todo.title }}</p>
+<p>Description: {{ todo.description }}</p>
+
+<form method="post">
+  {% csrf_token %}
+  <label for="confirm">Type 'yes' to confirm deletion:</label>
+  <input type="text" id="confirm" name="confirm">
+  <button type="submit">Delete</button>
+</form>
+
+<a href="{% url 'todos:index' %}">Cancel</a>

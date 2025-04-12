@@ -1,11 +1,11 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import NewTodoForm, UpdateTodoForm
 from .models import Todo
 
 # Create your views here.
+
+
 
 def index(request):
   todos = Todo.objects.all()
@@ -21,10 +21,9 @@ def new(request):
 
     if form.is_valid():
       form.save()
-      return HttpResponseRedirect(reverse("index"))
+      return redirect("todos:index")
   else:
     form = NewTodoForm()
-
   return render(request, 'todos/new.html', {'form' : form})
 
 def update(request,pk):
@@ -34,13 +33,18 @@ def update(request,pk):
 
     if form.is_valid():
       form.save()
-      return HttpResponseRedirect(reverse("index"))
+      return redirect("todos:index")
   else:
     form = UpdateTodoForm(instance=todo)
   return render(request, 'todos/update.html', { 'form' : form })
 
 def delete(request,pk):
-  todo = Todo.objects.get(pk=pk)
+  todo = get_object_or_404(Todo, pk=pk)
   if request.method == 'POST':
-    todo.delete()
-    return HttpResponseRedirect(reverse("index"))
+    confirm = request.POST.get('confirm', '').lower() == 'yes'
+    if confirm:
+      todo.delete()
+      return redirect('todos:index') 
+    else:
+      return redirect('todos:index')
+  return render(request, 'todos/delete.html', {'todo': todo})
