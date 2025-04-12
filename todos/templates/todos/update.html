@@ -1,5 +1,11 @@
-<h1>Update</h1>
-<form action="" method="post">
-	{% csrf_token %} {{ form.as_p }}
-	<input type="submit" value="Save Todo" />
-</form>
+{% extends 'todos/layout.html' %} 
+{% block title %}Atlas Homepage{% endblock %} 
+{% block content %}
+<div class="modal-box">
+  <h1>Update</h1>
+  <form action="" method="post">
+    {% csrf_token %} {{ form.as_p }}
+    <input type="submit" value="Save Todo" />
+  </form>
+</div>
+{% endblock %}

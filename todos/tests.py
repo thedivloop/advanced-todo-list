@@ -16,7 +16,6 @@ class TodosAppConfigTest(TestCase):
     assert isinstance(app_config, TodosConfig)
     assert app_config.name == app_name
 
-# @skip("Skipping this test temporarily")
 class TodosModelTest(TestCase):
   def test_todos_model_exists(self):
     todos = Todo.objects.count()
@@ -48,7 +47,6 @@ class TodosModelTest(TestCase):
     self.assertEqual(todo.priority, "High")
     self.assertEqual(todo.status, "Pending")
 
-# @skip("Skipping this test temporarily")
 class IndexPageTest(TestCase):
   def setUp(self):
     self.todo = Todo.objects.create(title='First todo')
@@ -64,7 +62,6 @@ class IndexPageTest(TestCase):
 
     self.assertContains(response, self.todo.title)
 
-# @skip("Skipping this test temporarily")
 class DetailPageTest(TestCase):
   def setUp(self):
     self.todo = Todo.objects.create(title='First todo', description='The description')
@@ -83,7 +80,6 @@ class DetailPageTest(TestCase):
     self.assertContains(response, self.todo.description)
     self.assertNotContains(response, self.todo2.title)
 
-# @skip("Skipping this test temporarily")
 class NewPageTest(TestCase):
   def setUp(self):
     self.url = f'/{app_name}/new/'
@@ -127,10 +123,9 @@ class NewPageTest(TestCase):
     self.assertRedirects(response, expected_url=f'/{app_name}/')
     self.assertEqual(Todo.objects.count(), 1)
 
-# @skip("Skipping this test temporarily")
+
 class UpdatePageTest(TestCase):
   def setUp(self):
-    # self.form = UpdateTodoForm
     self.todo = Todo.objects.create(title='Original Title',
                                     description='Original Description',
                                     priority='Medium',
@@ -175,62 +170,6 @@ class UpdatePageTest(TestCase):
     self.assertEqual(self.todo.description, 'Updated Description')
     self.assertRedirects(response, reverse('todos:index'))
 
-  # # def test_form_can_be_valid(self):
-  # #   self.assertTrue(issubclass(self.form, UpdateTodoForm))
-  # #   self.assertTrue('title' in self.form.Meta.fields)
-  # #   self.assertTrue('description' in self.form.Meta.fields)
-  
-  # #   form = self.form({
-  # #     'title': 'The title',
-  # #     'description': 'The description',
-  # #     'priority': 'Medium',
-  # #     'status': 'Pending',
-  # #   }, instance=self.todo)
-
-  # #   self.assertTrue(form.is_valid())
-  # #   form.save()
-  # #   self.assertEqual(Todo.objects.get(pk=self.todo.pk).title, 'The title')
-
-  # # def test_form_can_be_invalid(self):
-  # #   form = self.form({
-  # #     'title': '',
-  # #     'description': 'The description'
-  # #   }, instance=self.todo)
-
-  # #   self.assertFalse(form.is_valid())
-
-  # # def test_update_page_form_rendering(self):
-  # #   response = self.client.get(f'/{app_name}/{self.todo.pk}/update/')
-
-  # #   self.assertContains(response, '<form')
-  # #   self.assertContains(response, 'csrfmiddlewaretoken')
-  # #   self.assertContains(response, '<label for')
-
-  #   # Test invalid form
-
-  #   response = self.client.post(f'/{app_name}/{self.todo.pk}/update/', {
-  #     'id': self.todo.pk,
-  #     'title': '',
-  #     'description': 'The description'
-  #   }, instance = self.todo)
-
-
-  #   self.assertContains(response,'<ul class="errorlist"')
-  #   self.assertContains(response,'This field is required.')
-
-  #   # test valid form
-
-  #   response = self.client.post(f'/{app_name}/{self.todo.pk}/update/',{
-  #     'title': 'The title',
-  #     'description': 'The description'
-  #   })
-
-  #   self.assertRedirects(response, expected_url=f'/{app_name}/')
-
-  #   self.assertEqual(Todo.objects.count(), 1)
-  #   self.assertEqual(Todo.objects.get(pk=self.todo.pk).title, 'The title')
-
-# @skip("Skipping this test temporarily")
 class DeletePageTest(TestCase):
   def setUp(self):
     self.todo = Todo.objects.create(

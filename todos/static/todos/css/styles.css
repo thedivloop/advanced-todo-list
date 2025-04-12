@@ -1,0 +1,185 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 0 15px;
+    background-color: #f4f4f4;
+}
+
+header {
+    position: fixed;
+    width: 100%;
+    padding: 1rem;
+    background-color: white;
+    top: 0;
+    z-index: 10;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav > ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav > ul > li {
+    margin: 0 15px;
+}
+
+a {
+    text-decoration: none;
+    color: #738883;
+}
+
+.active-page {
+    color: #3CD4B3;
+}
+
+.app-access li {
+    border: #3CD4B3 solid 2px;
+    border-radius: 1.2rem;
+    font-weight: bold;
+}
+
+.app-access li a {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+}
+
+.login-button {
+    background-color: #3CD4B3;
+    cursor: pointer;
+}
+
+.login-button > a {
+    color: white;
+}
+
+.login-button:hover {
+    background-color: white;
+}
+
+.login-button:hover > a {
+    color: #3CD4B3;
+}
+
+.register-button > a {
+    color: #3CD4B3;
+}
+
+.register-button:hover {
+    background-color: #3CD4B3;
+}
+
+.register-button:hover > a {
+    color: white;
+}
+
+main {
+    margin-top: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.modal-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    background-color: white;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+h1 {
+    color: #738883;
+    font-size: 1.8em;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+form {
+    width: 100%;
+}
+
+form div {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input[type="submit"] {
+    background-color: #3CD4B3;
+    color: white;
+    padding: 0.7rem;
+    display: block;
+    width: 100%;
+    border: #3CD4B3 solid 2px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    color: #3CD4B3;
+    background-color: white;
+}
+
+.helptext {
+    display: block;
+    font-style: italic;
+    color: rgb(215, 100, 100);
+    font-size: 0.8em;
+    margin-top: 0.5rem;
+}

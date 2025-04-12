@@ -15,7 +15,7 @@ class NewTodoForm(forms.ModelForm):
       'status': 'Status',
       'due_date': 'Due Date',
       'duration': 'Duration',
-      'time_completion': 'Time Completion',
+      'time_completion': 'Completion rate',
       'time_spent': 'Time Spent',
       'time_remaining': 'Time Remaining',
     }
@@ -25,8 +25,8 @@ class NewTodoForm(forms.ModelForm):
       'priority': 'Select the priority level.',
       'status': 'Select the current status of the todo item.',
       'due_date': 'Select the due date for this todo item.',
-      'duration': 'Enter the estimated duration for this todo item.',
-      'time_completion': 'Enter the time taken to complete this todo item.',
+      'duration': 'Enter the estimated duration in minutes for this todo item.',
+      'time_completion': 'Enter the completion rate in %.',
       'time_spent': 'Enter the time spent on this todo item.',
     }
     error_messages = {
@@ -68,7 +68,7 @@ class UpdateTodoForm(forms.ModelForm):
       'status': 'Status',
       'due_date': 'Due Date',
       'duration': 'Duration',
-      'time_completion': 'Time Completion',
+      'time_completion': 'Completion rate',
       'time_spent': 'Time Spent',
       'time_remaining': 'Time Remaining',
     }
@@ -78,8 +78,8 @@ class UpdateTodoForm(forms.ModelForm):
       'priority': 'Select the priority level.',
       'status': 'Select the current status of the todo item.',
       'due_date': 'Select the due date for this todo item.',
-      'duration': 'Enter the estimated duration for this todo item.',
-      'time_completion': 'Enter the time taken to complete this todo item.',
+      'duration': 'Enter the estimated duration in minutes for this todo item.',
+      'time_completion': 'Enter the completion rate in %.',
       'time_spent': 'Enter the time spent on this todo item.',
       'time_remaining': 'Enter the time remaining for this todo item.',
     }
