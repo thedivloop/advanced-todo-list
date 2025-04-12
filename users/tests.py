@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.apps import apps
 from users.apps import UsersConfig
-from common.constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, LOGOUT_URL, LOGIN_TEMPLATE, REGISTER_TEMPLATE, TODOS_URL
+from common.constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, LOGOUT_URL, LOGIN_TEMPLATE, REGISTER_TEMPLATE, TODOS_URL, DASHBOARD_TEMPLATE
 
 # Create your tests here.
 
@@ -94,7 +94,7 @@ class RegisterPageTest(TestCase):
       'password2': 'SuperSecret123'
     })
 
-    self.assertRedirects(response, DASHBOARD_URL)
+    self.assertRedirects(response, TODOS_URL)
     self.assertTrue(User.objects.filter(username='newuser').exists())
 
   def test_register_with_mismatched_passwords_shows_error(self):
@@ -148,7 +148,17 @@ class LogoutPageTest(TestCase):
 
 class DashboardPageTest(TestCase):
 
+  def test_dashboard_get_request_renders_form_if_logged_in(self):
+    create_test_user()
+    self.client.post(LOGIN_URL, {
+        'username': 'testuser',
+        'password': 'testpass123'
+    })
+    response = self.client.get(DASHBOARD_URL)
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, DASHBOARD_TEMPLATE)
+
   def test_redirection_to_loginpage_ifnot_loggedin(self):
-    response = self.client.get('/todos/')
+    response = self.client.get(DASHBOARD_URL)
     self.assertEqual(response.status_code, 302)
-    self.assertRedirects(response, '/login/?next=/todos/')  
+    self.assertRedirects(response, '/login/?next=/dashboard/')  

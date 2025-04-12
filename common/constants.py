@@ -6,6 +6,7 @@ DASHBOARD_URL = reverse_lazy('users:dashboard')
 TODOS_URL = reverse_lazy('todos:index')
 LOGOUT_URL = reverse_lazy('users:logout')
 
+DASHBOARD_TEMPLATE = 'users/dashboard.html'
 LOGIN_TEMPLATE = 'users/login.html'
 REGISTER_TEMPLATE = 'users/register.html'
 

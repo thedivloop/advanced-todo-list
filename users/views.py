@@ -32,7 +32,7 @@ def register_view(request):
     if form.is_valid():
       user = form.save()
       login(request, user)
-      return redirect(reverse(TODOS_URL))
+      return redirect(TODOS_URL)
   else:
     form = UserCreationForm()
     form.errors.clear()
