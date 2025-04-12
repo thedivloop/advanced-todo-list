@@ -4,12 +4,116 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Todos</title>
-	</head>
-	<body>
-		<h1>Welcome</h1>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: 'Roboto', sans-serif;
+      }
 
-		{% for todo in todos %}
-		<p><a href="{{ current_path }}{{ todo.id }}/">{{ todo.title }}</a></p>
-		{% endfor %}
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+
+      .main-container {
+        display: flex;
+        flex-direction: column;
+        max-width: 1200px;
+        width: 80%;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      h1 {
+        text-align: center;
+        color: #738883;
+        margin-bottom: 2rem;
+      }
+
+      .todo-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .todo-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .todo-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .todo-card h2 {
+            font-size: 1.6em;
+            margin-bottom: 0.8rem;
+            color: #3CD4B3;
+        }
+
+        .todo-card p {
+            margin: 0.5rem 0;
+            font-size: 1em;
+            color: #555;
+        }
+
+        .todo-card .priority {
+            font-weight: bold;
+            color: #3CD4B3;
+        }
+
+        .todo-card .status {
+            color: #738883;
+            font-style: italic;
+        }
+
+        .todo-card .due-date {
+            color: #D57373;
+            font-size: 0.9em;
+        }
+
+        .todo-card a {
+            text-decoration: none;
+            color: white;
+            background-color: #3CD4B3;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .todo-card a:hover {
+            background-color: #29a17a;
+        }
+
+    </style>
+  </head>
+	<body>
+    <div class="main-container">
+      <h1>Welcome</h1>
+      <p>Here are your todos:</p><ul class="todo-list">
+        {% for todo in todos %}
+        <li class="todo-card">
+          <h2><a href="{{ current_path }}{{ todo.id }}/">{{ todo.title }}</a></h2>
+          <p class="description">{{ todo.description}}</p>
+          <p class="priority">Priority: {{ todo.priority }}</p>
+          <p class="status">Status: {{ todo.status }}</p>
+          <p class="due-date">Due Date: {{ todo.due_date }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
 	</body>
 </html>

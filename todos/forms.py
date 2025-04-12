@@ -4,6 +4,7 @@ from .models import Todo
 class NewTodoForm(forms.ModelForm):
   class Meta:
     model = Todo
+    # exclude = ['user']
     fields = ('title', 'description', 'priority', 'status', 'due_date', 'duration', 'time_completion', 'time_spent', 'time_remaining')
     widgets = {
       'due_date': forms.DateInput(attrs={'type': 'date'}),

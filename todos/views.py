@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 
 from .forms import NewTodoForm, UpdateTodoForm
 from .models import Todo
@@ -16,11 +17,12 @@ def detail(request, pk):
   return render(request, 'todos/detail.html', {'todo': todo})
 
 def new(request):
-  if request.method== 'POST':
+  if request.method == 'POST':
     form = NewTodoForm(request.POST)
-
     if form.is_valid():
-      form.save()
+      todo = form.save(commit=False)
+      todo.user = request.user
+      todo.save()
       return redirect("todos:index")
   else:
     form = NewTodoForm()
@@ -32,7 +34,9 @@ def update(request,pk):
     form = UpdateTodoForm(request.POST, instance=todo)
 
     if form.is_valid():
-      form.save()
+      todo = form.save(commit=False)
+      todo.user = request.user
+      todo.save()
       return redirect("todos:index")
   else:
     form = UpdateTodoForm(instance=todo)
@@ -41,10 +45,10 @@ def update(request,pk):
 def delete(request,pk):
   todo = get_object_or_404(Todo, pk=pk)
   if request.method == 'POST':
-    confirm = request.POST.get('confirm', '').lower() == 'yes'
-    if confirm:
+    is_confirmed = request.POST.get('confirm', '').lower() == 'yes'
+    if is_confirmed:
+      if todo.user != request.user:
+        return HttpResponseForbidden("You cannot delete this Todo")
       todo.delete()
-      return redirect('todos:index') 
-    else:
-      return redirect('todos:index')
+    return redirect('todos:index')
   return render(request, 'todos/delete.html', {'todo': todo})
