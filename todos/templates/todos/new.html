@@ -1,5 +1,11 @@
-<h1>New Todo</h1>
-<form action="" method="post">
-	{% csrf_token %} {{ form.as_p }}
-	<input type="submit" value="Create Todo" />
-</form>
+{% extends 'todos/layout.html' %} 
+{% block title %}New Todo{% endblock %} 
+{% block content %}
+<div class="modal-box">
+  <h1>New Todo</h1>
+  <form action="" method="post">
+    {% csrf_token %} {{ form.as_p }}
+    <input type="submit" value="Create Todo" />
+  </form>
+</div>
+{% endblock %}
