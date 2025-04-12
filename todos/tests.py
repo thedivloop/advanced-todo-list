@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from todos.apps import TodosConfig
-from unittest import skip
 from .forms import NewTodoForm
 from .models import Todo
 
@@ -59,7 +58,17 @@ class TodosModelTest(TestCase):
 class IndexPageTest(LoggedInTestCase):
   def setUp(self):
     super().setUp()
+    self.non_owner = User.objects.create_user(username='non_owner', password='password')
+
     self.todo = Todo.objects.create(title='First todo', user=self.user)
+    self.todo2 = Todo.objects.create(title='Test Todo 2', user=self.user)
+    self.todo3 = Todo.objects.create(title='Non-owner Todo', user=self.non_owner)
+
+  def test_index_page_displays_only_user_own_todos(self):
+    response = self.client.get(reverse('todos:index'))
+    self.assertContains(response, self.todo.title)
+    self.assertContains(response, self.todo2.title)
+    self.assertNotContains(response, self.todo3.title)
 
   def test_index_page_returns_correct_response(self):
     response = self.client.get(f'/{app_name}/')

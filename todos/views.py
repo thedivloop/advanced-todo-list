@@ -5,11 +5,9 @@ from django.http import HttpResponseForbidden
 from .forms import NewTodoForm, UpdateTodoForm
 from .models import Todo
 
-# Create your views here.
-
 @login_required
 def index(request):
-  todos = Todo.objects.all()
+  todos = Todo.objects.filter(user=request.user)
   return render(request, 'todos/index.html', {'todos': todos, 'current_path': request.path})
 
 @login_required
