@@ -43,7 +43,6 @@ ehthumbs.db
 # Coverage reports
 .coverage
 .coverage.*
-*.coveragerc
 nosetests.xml
 coverage.xml
 *.hypothesis/
