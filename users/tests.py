@@ -1,9 +1,8 @@
-from django.contrib.auth.models import User
-from django.test import Client
-from django.contrib import auth
-from django.test import TestCase
-from django.urls import reverse
 from django.apps import apps
+from django.contrib import auth
+from django.contrib.auth.models import User
+from django.test import Client, TestCase
+from django.utils.http import urlencode
 from users.apps import UsersConfig
 from common.constants import LOGIN_URL, REGISTER_URL, DASHBOARD_URL, LOGOUT_URL, LOGIN_TEMPLATE, REGISTER_TEMPLATE, TODOS_URL, DASHBOARD_TEMPLATE
 
@@ -21,6 +20,11 @@ class UsersAppConfigTest(TestCase):
     app_config = apps.get_app_config(app_name)
     assert isinstance(app_config, UsersConfig)
     assert app_config.name == app_name
+
+class UserModelTest(TestCase):
+  def test_user_str_returns_username(self):
+    user = User.objects.create_user(username="alice", password="secure123")
+    self.assertEqual(str(user), "alice")
 
 class LoginPageTest(TestCase):
 
@@ -72,11 +76,8 @@ class LoginPageTest(TestCase):
 
     self.assertEqual(response.status_code, 403)  # Forbidden due to missing CSRF token
 
-
-
 class RegisterPageTest(TestCase):
   
-
   def test_register_page_renders_form(self):
     response = self.client.get(REGISTER_URL)
     self.assertEqual(response.status_code, 200)
@@ -158,7 +159,8 @@ class DashboardPageTest(TestCase):
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, DASHBOARD_TEMPLATE)
 
-  def test_redirection_to_loginpage_ifnot_loggedin(self):
+  def test_dashboard_redirects_to_login_if_not_logged_in(self):
     response = self.client.get(DASHBOARD_URL)
     self.assertEqual(response.status_code, 302)
-    self.assertRedirects(response, '/login/?next=/dashboard/')  
+    login_url_with_next = f"{LOGIN_URL}?{urlencode({'next': DASHBOARD_URL})}"
+    self.assertRedirects(response, login_url_with_next)  
