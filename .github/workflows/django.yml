@@ -37,10 +37,9 @@ jobs:
         pip install -r requirements.txt
         pip install chromedriver-autoinstaller
     
-    - name: Set up ChromeDriver with chromedriver-autoinstaller
-      run: |
-        python -m chromedriver_autoinstaller
-        
+    - name: Install matching ChromeDriver
+      run: python install_chromedriver.py
+
     - name: Run Migrations
       run: python manage.py migrate
         
