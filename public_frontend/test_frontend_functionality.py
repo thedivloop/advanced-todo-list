@@ -62,8 +62,10 @@ class LoginPageTest(TestCase):
     self.driver.find_element(By.NAME, "password1").send_keys("TestPassword123!")
     self.driver.find_element(By.NAME, "password2").send_keys("TestPassword123!")
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
-    self.driver.get("http://127.0.0.1:8000/logout/")
-    self.driver.get("http://127.0.0.1:8000/login/")
+    WebDriverWait(self.driver, 5).until(EC.url_contains("/todos/"))
+    self.driver.get("http://127.0.0.1:8000/logout")
+    WebDriverWait(self.driver, 5).until(EC.url_contains("/login/"))
+    # self.driver.get("http://127.0.0.1:8000/login/")
     try:
       WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.NAME, "username")))
     except:
