@@ -52,7 +52,7 @@ jobs:
       env:
         DJANGO_SETTINGS_MODULE: advanced_todo_list.settings  
       run: |
-        coverage run manage.py test --keepdb --verbosity=3
+        coverage run manage.py test --verbosity=3
         coverage report -m
 
     timeout-minutes: 10
