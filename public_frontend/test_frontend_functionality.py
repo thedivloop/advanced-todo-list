@@ -1,5 +1,6 @@
 # import os
 # import pathlib
+import random
 from unittest import TestCase, skip, main
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -56,9 +57,18 @@ class LoginPageTest(TestCase):
     self.assertTrue(self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']"))
   
   def test_login_valid_credentials(self):
+    self.driver.get("http://127.0.0.1:8000/register/")
+    self.driver.find_element(By.NAME, "username").send_keys("testuser123")
+    self.driver.find_element(By.NAME, "password1").send_keys("TestPassword123!")
+    self.driver.find_element(By.NAME, "password2").send_keys("TestPassword123!")
+    self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
+    self.driver.get("http://127.0.0.1:8000/logout/")
     self.driver.get("http://127.0.0.1:8000/login/")
-    self.driver.find_element(By.NAME, "username").send_keys("babyman")
-    self.driver.find_element(By.NAME, "password").send_keys("!@#$%^&*()")
+    WebDriverWait(self.driver, 5).until(
+        EC.presence_of_element_located((By.NAME, "username"))
+    )
+    self.driver.find_element(By.NAME, "username").send_keys("testuser123")
+    self.driver.find_element(By.NAME, "password").send_keys("TestPassword123!")
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 2)
     # Assert that after login, the user is redirected to the home page
@@ -80,7 +90,42 @@ class LoginPageTest(TestCase):
   def tearDown(self):
     self.driver.quit()
 
-# @skip("skip")
+class RegisterPageTest(TestCase):
+  def setUp(self):
+    self.driver = webdriver.Chrome(options=options)
+
+  def test_register_form_rendering(self):
+    self.driver.get("http://127.0.0.1:8000/register/")
+    self.assertTrue(self.driver.find_element(By.NAME, "username"))
+    self.assertTrue(self.driver.find_element(By.NAME, "password1"))
+    self.assertTrue(self.driver.find_element(By.NAME, "password2"))
+    self.assertTrue(self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']"))
+
+  def test_register_valid_user(self):
+    unique_id = random.randint(1000, 9999)
+    self.driver.get("http://127.0.0.1:8000/register/")
+    self.driver.find_element(By.NAME, "username").send_keys(f"testuser{unique_id}")
+    self.driver.find_element(By.NAME, "password1").send_keys("TestPassword123!")
+    self.driver.find_element(By.NAME, "password2").send_keys("TestPassword123!")
+    self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
+    WebDriverWait(self.driver, 5).until(EC.url_contains("/todos/"))
+    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/todos/")
+
+  def test_register_mismatched_passwords(self):
+    self.driver.get("http://127.0.0.1:8000/register/")
+    self.driver.find_element(By.NAME, "username").send_keys("testmismatch")
+    self.driver.find_element(By.NAME, "password1").send_keys("TestPassword123!")
+    self.driver.find_element(By.NAME, "password2").send_keys("DifferentPassword!")
+    self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
+    WebDriverWait(self.driver, 2)
+    self.assertIn("password", self.driver.page_source.lower())
+    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/register/")
+
+  def tearDown(self):
+    self.driver.quit()
+
+
+@skip("skip")
 class LogoutPageTest(TestCase):
   def setUp(self):
     self.driver = webdriver.Chrome(options=options)
