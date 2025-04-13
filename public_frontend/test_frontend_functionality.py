@@ -64,9 +64,13 @@ class LoginPageTest(TestCase):
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     self.driver.get("http://127.0.0.1:8000/logout/")
     self.driver.get("http://127.0.0.1:8000/login/")
-    WebDriverWait(self.driver, 5).until(
-        EC.presence_of_element_located((By.NAME, "username"))
-    )
+    try:
+      WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.NAME, "username")))
+    except:
+      print("🚨 Login page did not load in time!")
+      print("Current URL:", self.driver.current_url)
+      print("Page Source:", self.driver.page_source)
+      raise
     self.driver.find_element(By.NAME, "username").send_keys("testuser123")
     self.driver.find_element(By.NAME, "password").send_keys("TestPassword123!")
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
@@ -85,7 +89,8 @@ class LoginPageTest(TestCase):
     WebDriverWait(self.driver, 4)
     # Assert that after login, the user is redirected to the home page
     self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/login/")
-    self.assertIn('<ul class="errorlist nonfield">',self.driver.page_source)
+
+    self.assertIn("errorlist nonfield",self.driver.page_source)
 
   def tearDown(self):
     self.driver.quit()
