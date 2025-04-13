@@ -76,7 +76,7 @@ class LoginPageTest(TestCase):
     self.driver.find_element(By.NAME, "username").send_keys("testuser123")
     self.driver.find_element(By.NAME, "password").send_keys("TestPassword123!")
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
-    WebDriverWait(self.driver, 2)
+    WebDriverWait(self.driver, 4)
     # Assert that after login, the user is redirected to the home page
     self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/todos/")
     # TODO update the 2 below asserts to match the /todos/ page
