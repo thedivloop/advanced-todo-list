@@ -1,168 +1,164 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detail View</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <style>
+{% extends 'todos/layout.html' %} 
+{% block title %}Detailed View{% endblock %} 
+{% block head %}
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
 * {
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+  }
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
 
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            max-width: 1200px;
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-        }
+  .main-container-detail {  
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+  }
 
-        h1 {
-            text-align: center;
-            color: #738883;
-            margin-bottom: 2rem;
-        }
+  h1 {
+    text-align: center;
+    color: #738883;
+    margin-bottom: 2rem;
+  }
 
-        /* Modal Box Style */
-        .modal-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border-radius: 10px;
-            background-color: white;
-            padding: 2rem;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            margin: 2rem auto;
-        }
+  /* Modal Box Style */
+  .modal-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    background-color: white;
+    padding: 2rem;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 2rem auto;
+  }
 
-        .modal-box h2 {
-            color: #3CD4B3;
-            font-size: 2em;
-            margin-bottom: 1rem;
-        }
+  .modal-box h2 {
+    color: #3CD4B3;
+    font-size: 2em;
+    margin-bottom: 1rem;
+  }
 
-        .modal-box p {
-            font-size: 1.1em;
-            color: #555;
-            margin: 0.8rem 0;
-        }
+  .modal-box p {
+    font-size: 1.1em;
+    color: #555;
+    margin: 0.8rem 0;
+  }
 
-        .modal-box .attribute-label {
-            font-weight: bold;
-            color: #738883;
-        }
+  .modal-box .attribute-label {
+    font-weight: bold;
+    color: #738883;
+  }
 
-        .modal-box .priority {
-            font-weight: bold;
-            color: #3CD4B3;
-        }
+  .modal-box .priority {
+    font-weight: bold;
+    color: #3CD4B3;
+  }
 
-        .modal-box .status {
-            font-style: italic;
-            color: #738883;
-        }
+  .modal-box .status {
+    font-style: italic;
+    color: #738883;
+  }
 
-        .modal-box .due-date {
-            color: #D57373;
-        }
+  .modal-box .due-date {
+    color: #D57373;
+  }
 
-        .modal-box .duration,
-        .modal-box .time-spent,
-        .modal-box .time-remaining {
-            font-size: 1em;
-            color: #3CD4B3;
-        }
+  .modal-box .duration,
+  .modal-box .time-spent,
+  .modal-box .time-remaining {
+    font-size: 1em;
+    color: #3CD4B3;
+  }
 
-        .modal-box .completion-rate {
-            font-size: 1em;
-            font-weight: bold;
-            color: #D57373;
-        }
+  .modal-box .completion-rate {
+    font-size: 1em;
+    font-weight: bold;
+    color: #D57373;
+  }
 
-        /* Action Buttons Style */
-        .modal-box .todo-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-        }
+  /* Action Buttons Style */
+  .modal-box .todo-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
 
-        .modal-box .todo-buttons a {
-            /* background-color: #3CD4B3; */
-            color: white;
-            padding: 0.7rem 1.5rem;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-            text-align: center;
-            width: 120px;
-            display: inline-block;
-        }
+  .modal-box .todo-buttons a {
+    /* background-color: #3CD4B3; */
+    color: white;
+    padding: 0.7rem 1.5rem;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    width: 120px;
+    display: inline-block;
+  }
 
-        .modal-box .edit-button:hover {
-            background-color: #29a17a;
-        }
+  .modal-box .edit-button:hover {
+    background-color: #29a17a;
+  }
 
-        .modal-box .edit-button {
-          background-color: #3CD4B3;
-        }
+  .modal-box .edit-button {
+    background-color: #3CD4B3;
+  }
 
-        .modal-box .delete-button {
-            background-color: #D57373;
-        }
+  .modal-box .delete-button {
+    background-color: #D57373;
+  }
 
-        .modal-box .delete-button:hover {
-            background-color: #b44d4d;
-        }
+  .modal-box .delete-button:hover {
+    background-color: #b44d4d;
+  }
 
-        .modal-box .back-button {
-          color: #738883;
-          font-size: 1rem;
-          font-weight: normal;
-          padding: 0;
-          margin-top: 1rem;
-          transition: color 0.3s ease;
-        }
+  .modal-box .back-button {
+    color: #738883;
+    font-size: 1rem;
+    font-weight: normal;
+    padding: 0;
+    margin-top: 1rem;
+    transition: color 0.3s ease;
+  }
 
-        .modal-box .back-button:hover {
-          color: #3CD4B3;
-          text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-  <div class="main-container">
-    <h1>Todo Detail</h1>
-    <div class="modal-box">
-      <h2>{{ todo.title }}</h2>
-      <p>{{ todo.description }}</p>
-      <p><span class="attribute-label">Description:</span> {{ todo.description }}</p>
-      <p><span class="attribute-label">Priority:</span> <span class="priority">{{ todo.priority }}</span></p>
-      <p><span class="attribute-label">Status:</span> <span class="status">{{ todo.status }}</span></p>
-      <p><span class="attribute-label">Due Date:</span> <span class="due-date">{{ todo.due_date }}</span></p>
-      <p><span class="attribute-label">Duration:</span> <span class="duration">{{ todo.duration }} minutes</span></p>
-      <p><span class="attribute-label">Time Spent:</span> <span class="time-spent">{{ todo.time_spent }} minutes</span></p>
-      <p><span class="attribute-label">Time Remaining:</span> <span class="time-remaining">{{ todo.time_remaining }} minutes</span></p>
-      <p><span class="attribute-label">Completion Rate:</span> <span class="completion-rate">{{ todo.time_completion }}%</span></p>
-      <div class="todo-buttons">
-        <a href="/todos/{{ todo.id }}/update/" class="edit-button">Edit</a>
-        <a href="/todos/{{ todo.id }}/delete/" class="delete-button">Delete</a>
-      </div>
-      <a href="/todos/" class="back-button">Back to Todos</a>
+  .modal-box .back-button:hover {
+    color: #3CD4B3;
+    text-decoration: underline;
+  }
+</style>
+{% endblock %} 
+
+{% block content %}
+<div class="main-container-detail">
+  <div class="modal-box">
+    <h2>{{ todo.title }}</h2>
+    <p>{{ todo.description }}</p>
+    <p><span class="attribute-label">Description:</span> {{ todo.description }}</p>
+    <p><span class="attribute-label">Priority:</span> <span class="priority">{{ todo.priority }}</span></p>
+    <p><span class="attribute-label">Status:</span> <span class="status">{{ todo.status }}</span></p>
+    <p><span class="attribute-label">Due Date:</span> <span class="due-date">{{ todo.due_date }}</span></p>
+    <p><span class="attribute-label">Duration:</span> <span class="duration">{{ todo.duration }} minutes</span></p>
+    <p><span class="attribute-label">Time Spent:</span> <span class="time-spent">{{ todo.time_spent }} minutes</span></p>
+    <p><span class="attribute-label">Time Remaining:</span> <span class="time-remaining">{{ todo.time_remaining }} minutes</span></p>
+    <p><span class="attribute-label">Completion Rate:</span> <span class="completion-rate">{{ todo.time_completion }}%</span></p>
+    <div class="todo-buttons">
+      <a href="/todos/{{ todo.id }}/update/" class="edit-button">Edit</a>
+      <a href="/todos/{{ todo.id }}/delete/" class="delete-button">Delete</a>
     </div>
+    <a href="/todos/" class="back-button">Back to Todos</a>
   </div>
-</body>
-</html>
+</div>
+{% endblock %} 
 

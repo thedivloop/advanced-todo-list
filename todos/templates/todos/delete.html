@@ -1,4 +1,7 @@
+{% extends 'todos/layout.html' %} 
+{% block title %}Delete Todo{% endblock %} 
 
+{% block content %}
 <h1>Are you sure you want to delete this Todo?</h1>
 <p>Title: {{ todo.title }}</p>
 <p>Description: {{ todo.description }}</p>
@@ -11,3 +14,4 @@
 </form>
 
 <a href="{% url 'todos:index' %}">Cancel</a>
+{% endblock %}
