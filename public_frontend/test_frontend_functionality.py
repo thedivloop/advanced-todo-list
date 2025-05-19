@@ -30,6 +30,15 @@ new_user_with_invalid_username = {
   "password2": "TestPassword123!"
 }
 
+pages_url = {
+  "home" : "http://127.0.0.1:8000",
+  "login": "http://127.0.0.1:8000/login/",
+  "register": "http://127.0.0.1:8000/register/",
+  "logout" : "http://127.0.0.1:8000/logout/",
+  "todos": "http://127.0.0.1:8000/todos/",
+  "dashboard": "http://127.0.0.1:8000/dashboard/"
+}
+
 def delete_test_user(username):
   try:
     user = User.objects.get(username=username)
@@ -42,7 +51,7 @@ class WebPageTests(TestCase):
 
   def setUp(self):
     self.driver = webdriver.Chrome(options=options)
-    self.driver.get("http://127.0.0.1:8000")
+    self.driver.get(pages_url["home"])
 
   def test_title(self):
     self.assertEqual(self.driver.title,"Atlas Homepage")
@@ -77,20 +86,20 @@ class LoginPageTest(TestCase):
     self.driver = webdriver.Chrome(options=options)
 
   def test_login_form_rendering(self):
-    self.driver.get("http://127.0.0.1:8000/login/")
+    self.driver.get(pages_url["login"])
     # Check if login form exists
     self.assertTrue(self.driver.find_element(By.NAME, "username"))
     self.assertTrue(self.driver.find_element(By.NAME, "password"))
     self.assertTrue(self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']"))
   
   def test_login_valid_credentials(self):
-    self.driver.get("http://127.0.0.1:8000/register/")
+    self.driver.get(pages_url["register"])
     self.driver.find_element(By.NAME, "username").send_keys(self.username)
     self.driver.find_element(By.NAME, "password1").send_keys(self.password)
     self.driver.find_element(By.NAME, "password2").send_keys(self.password2)
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 5).until(EC.url_contains("/todos/"))
-    self.driver.get("http://127.0.0.1:8000/logout")
+    self.driver.get(pages_url["logout"])
     WebDriverWait(self.driver, 5).until(EC.url_contains("/login/"))
     # self.driver.get("http://127.0.0.1:8000/login/")
     try:
@@ -105,20 +114,20 @@ class LoginPageTest(TestCase):
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 5).until(EC.url_contains("/todos/"))
     # Assert that after login, the user is redirected to the home page
-    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/todos/")
+    self.assertEqual(self.driver.current_url, pages_url["todos"])
     # TODO update the 2 below asserts to match the /todos/ page
     # self.assertIn('<h1>Dashboard</h1>',self.driver.page_source)
     # self.assertIn('<a href="/logout',self.driver.page_source)
     delete_test_user(self.username)
 
   def test_login_invalid_credentials(self):
-    self.driver.get("http://127.0.0.1:8000/login/")
+    self.driver.get(pages_url["login"])
     self.driver.find_element(By.NAME, "username").send_keys(new_user_with_invalid_username["username"])
     self.driver.find_element(By.NAME, "password").send_keys(new_user_with_invalid_username["password1"])
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 4)
     # Assert that after login, the user is redirected to the home page
-    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/login/")
+    self.assertEqual(self.driver.current_url, pages_url["login"])
 
     self.assertIn("errorlist nonfield",self.driver.page_source)
 
@@ -135,31 +144,31 @@ class RegisterPageTest(TestCase):
     self.driver = webdriver.Chrome(options=options)
 
   def test_register_form_rendering(self):
-    self.driver.get("http://127.0.0.1:8000/register/")
+    self.driver.get(pages_url["register"])
     self.assertTrue(self.driver.find_element(By.NAME, "username"))
     self.assertTrue(self.driver.find_element(By.NAME, "password1"))
     self.assertTrue(self.driver.find_element(By.NAME, "password2"))
     self.assertTrue(self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']"))
 
   def test_register_valid_user(self):
-    self.driver.get("http://127.0.0.1:8000/register/")
+    self.driver.get(pages_url["register"])
     self.driver.find_element(By.NAME, "username").send_keys(self.username)
     self.driver.find_element(By.NAME, "password1").send_keys("TestPassword123!")
     self.driver.find_element(By.NAME, "password2").send_keys("TestPassword123!")
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 5).until(EC.url_contains("/todos/"))
-    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/todos/")
+    self.assertEqual(self.driver.current_url, pages_url["todos"])
     delete_test_user(self.username)
 
   def test_register_mismatched_passwords(self):
-    self.driver.get("http://127.0.0.1:8000/register/")
-    self.driver.find_element(By.NAME, "username").send_keys("testmismatch")
-    self.driver.find_element(By.NAME, "password1").send_keys("TestPassword123!")
-    self.driver.find_element(By.NAME, "password2").send_keys("DifferentPassword!")
+    self.driver.get(pages_url["register"])
+    self.driver.find_element(By.NAME, "username").send_keys(new_user_with_mismatched_passwords["username"])
+    self.driver.find_element(By.NAME, "password1").send_keys(new_user_with_mismatched_passwords["password1"])
+    self.driver.find_element(By.NAME, "password2").send_keys(new_user_with_mismatched_passwords["password2"])
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 2)
     self.assertIn("password", self.driver.page_source.lower())
-    self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/register/")
+    self.assertEqual(self.driver.current_url, pages_url["register"])
 
   def tearDown(self):
     self.driver.quit()
@@ -171,7 +180,7 @@ class LogoutPageTest(TestCase):
     self.driver = webdriver.Chrome(options=options)
 
   def test_logout_redirect(self):
-    self.driver.get("http://127.0.0.1:8000/login/")
+    self.driver.get(pages_url["login"])
     self.driver.find_element(By.NAME, "username").send_keys("babyman")
     self.driver.find_element(By.NAME, "password").send_keys("!@#$%^&*()")
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
@@ -190,7 +199,7 @@ class DashboardPageTest(TestCase):
     self.driver = webdriver.Chrome(options=options)
 
   def test_redirection_to_loginpage_ifnot_loggedin(self):
-    self.driver.get("http://127.0.0.1:8000/dashboard/")
+    self.driver.get(pages_url["dashboard"])
     WebDriverWait(self.driver, 2)
     self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/login/?next=/dashboard/")
 
