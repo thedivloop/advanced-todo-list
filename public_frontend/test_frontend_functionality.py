@@ -2,6 +2,7 @@
 # import pathlib
 import random
 from unittest import TestCase, skip, main
+from django.contrib.auth.models import User
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -17,6 +18,25 @@ options.add_argument('--disable-dev-shm-usage') # Prevents crashes due to limite
 # def file_uri(filename):
 #   return pathlib.Path(os.path.abspath(filename)).as_uri()
 
+new_user_with_mismatched_passwords = {
+  "username": "testuser123",
+  "password1": "TestPassword123!",
+  "password2": "DifferentPassword!"
+}
+
+new_user_with_invalid_username = {
+  "username": "badtestuser123",
+  "password1": "TestPassword123!",
+  "password2": "TestPassword123!"
+}
+
+def delete_test_user(username):
+  try:
+    user = User.objects.get(username=username)
+    user.delete()
+    print("User deleted successfully.")
+  except User.DoesNotExist:
+    print("User does not exist.")
 
 class WebPageTests(TestCase):
 
@@ -46,6 +66,13 @@ class WebPageTests(TestCase):
     self.driver.quit()
 
 class LoginPageTest(TestCase):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    unique_id = random.randint(1000, 9999)
+    self.username = f"testuser{unique_id}"
+    self.password = f"TestPassword{unique_id}!"
+    self.password2 = f"TestPassword{unique_id}!"
+
   def setUp(self):
     self.driver = webdriver.Chrome(options=options)
 
@@ -58,9 +85,9 @@ class LoginPageTest(TestCase):
   
   def test_login_valid_credentials(self):
     self.driver.get("http://127.0.0.1:8000/register/")
-    self.driver.find_element(By.NAME, "username").send_keys("testuser123")
-    self.driver.find_element(By.NAME, "password1").send_keys("TestPassword123!")
-    self.driver.find_element(By.NAME, "password2").send_keys("TestPassword123!")
+    self.driver.find_element(By.NAME, "username").send_keys(self.username)
+    self.driver.find_element(By.NAME, "password1").send_keys(self.password)
+    self.driver.find_element(By.NAME, "password2").send_keys(self.password2)
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 5).until(EC.url_contains("/todos/"))
     self.driver.get("http://127.0.0.1:8000/logout")
@@ -73,8 +100,8 @@ class LoginPageTest(TestCase):
       print("Current URL:", self.driver.current_url)
       print("Page Source:", self.driver.page_source)
       raise
-    self.driver.find_element(By.NAME, "username").send_keys("testuser123")
-    self.driver.find_element(By.NAME, "password").send_keys("TestPassword123!")
+    self.driver.find_element(By.NAME, "username").send_keys(self.username)
+    self.driver.find_element(By.NAME, "password").send_keys(self.password)
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 5).until(EC.url_contains("/todos/"))
     # Assert that after login, the user is redirected to the home page
@@ -82,11 +109,12 @@ class LoginPageTest(TestCase):
     # TODO update the 2 below asserts to match the /todos/ page
     # self.assertIn('<h1>Dashboard</h1>',self.driver.page_source)
     # self.assertIn('<a href="/logout',self.driver.page_source)
+    delete_test_user(self.username)
 
   def test_login_invalid_credentials(self):
     self.driver.get("http://127.0.0.1:8000/login/")
-    self.driver.find_element(By.NAME, "username").send_keys("b")
-    self.driver.find_element(By.NAME, "password").send_keys("!@#$")
+    self.driver.find_element(By.NAME, "username").send_keys(new_user_with_invalid_username["username"])
+    self.driver.find_element(By.NAME, "password").send_keys(new_user_with_invalid_username["password1"])
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 4)
     # Assert that after login, the user is redirected to the home page
@@ -98,6 +126,11 @@ class LoginPageTest(TestCase):
     self.driver.quit()
 
 class RegisterPageTest(TestCase):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    unique_id = random.randint(1000, 9999)
+    self.username = f"testuser{unique_id}"
+
   def setUp(self):
     self.driver = webdriver.Chrome(options=options)
 
@@ -109,14 +142,14 @@ class RegisterPageTest(TestCase):
     self.assertTrue(self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']"))
 
   def test_register_valid_user(self):
-    unique_id = random.randint(1000, 9999)
     self.driver.get("http://127.0.0.1:8000/register/")
-    self.driver.find_element(By.NAME, "username").send_keys(f"testuser{unique_id}")
+    self.driver.find_element(By.NAME, "username").send_keys(self.username)
     self.driver.find_element(By.NAME, "password1").send_keys("TestPassword123!")
     self.driver.find_element(By.NAME, "password2").send_keys("TestPassword123!")
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
     WebDriverWait(self.driver, 5).until(EC.url_contains("/todos/"))
     self.assertEqual(self.driver.current_url, "http://127.0.0.1:8000/todos/")
+    delete_test_user(self.username)
 
   def test_register_mismatched_passwords(self):
     self.driver.get("http://127.0.0.1:8000/register/")
