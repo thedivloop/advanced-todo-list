@@ -1,4 +1,4 @@
-{% extends 'todos/layout.html' %} 
+{% extends 'base_app.html' %} 
 {% block title %}Your Todos{% endblock %} 
 {% block head %}
 <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
@@ -99,7 +99,10 @@
 {% endblock %} 
 
 {% block content %}
-<div class="main-container-index">
+<div class="main-dashboard" style="display: flex;">
+  {% include "partials/navbar.html" %}
+
+<div class="main-container-index" >
   <ul class="todo-list">
     {% for todo in todos %}
     <li class="todo-card">
@@ -111,5 +114,6 @@
     </li>
     {% endfor %}
   </ul>
+</div>
 </div>
 {% endblock %}
