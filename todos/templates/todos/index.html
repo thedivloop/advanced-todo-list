@@ -1,7 +1,9 @@
-{% extends 'base_app.html' %} 
-{% block title %}Your Todos{% endblock %} 
-{% block head %}
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Your Todos{% endblock %}
+
+{% block extra_css %}
 <style>
   * {
     box-sizing: border-box;
@@ -17,16 +19,13 @@
 
   .main-container-index {
     margin-left: 10rem;
-    /* max-width: 1200px; */
     width: 100%;
-    margin-left: 10rem;
     padding: 2rem;
   }
 
   .todo-dashboard {
     display: flex;
     flex-direction: column;
-    /* max-width: 1200px; */
     margin-left: 10rem;
     padding: 2rem;
   }
@@ -38,91 +37,120 @@
   }
 
   .todo-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
-        padding: 0;
-        list-style-type: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 0;
+    list-style-type: none;
   }
 
   .todo-card {
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      padding: 1.5rem;
-      transition: transform 0.3s ease;
-      display: flex;
-      flex-direction: column;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
   }
 
   .todo-card:hover {
-      transform: translateY(-5px);
+    transform: translateY(-5px);
   }
 
   .todo-card h2 {
-      font-size: 1.6em;
-      margin-bottom: 0.8rem;
-      color: #3CD4B3;
+    font-size: 1.6em;
+    margin-bottom: 0.8rem;
+    color: #3CD4B3;
   }
 
   .todo-card p {
-      margin: 0.5rem 0;
-      font-size: 1em;
-      color: #555;
+    margin: 0.5rem 0;
+    font-size: 1em;
+    color: #555;
   }
 
   .todo-card .priority {
-      font-weight: bold;
-      color: #3CD4B3;
+    font-weight: bold;
+    color: #3CD4B3;
   }
 
   .todo-card .status {
-      color: #738883;
-      font-style: italic;
+    color: #738883;
+    font-style: italic;
   }
 
   .todo-card .due-date {
-      color: #D57373;
-      font-size: 0.9em;
+    color: #D57373;
+    font-size: 0.9em;
   }
 
   .todo-card a {
-      text-decoration: none;
-      color: white;
-      background-color: #3CD4B3;
-      padding: 0.5rem;
-      border-radius: 4px;
-      font-weight: bold;
-      text-align: center;
-      transition: background-color 0.3s ease;
-      margin-top: 1rem;
+    text-decoration: none;
+    color: white;
+    background-color: #3CD4B3;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
   }
 
   .todo-card a:hover {
-      background-color: #29a17a;
+    background-color: #29a17a;
   }
 
+  .add-todo-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: #3CD4B3;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .add-todo-button:hover {
+    background-color: #29a17a;
+    transform: scale(1.1);
+  }
 </style>
-{% endblock %} 
+{% endblock %}
 
 {% block content %}
 <div class="main-dashboard" style="display: flex;">
   {% include "partials/navbar.html" %}
 
-  <div class="main-container-index" >
+  <div class="main-container-index">
     <div class="todo-dashboard">
+      <h1>My Todos</h1>
       <ul class="todo-list">
         {% for todo in todos %}
         <li class="todo-card">
-          <h2><a href="{{ current_path }}{{ todo.id }}/">{{ todo.title }}</a></h2>
-          <p class="description">{{ todo.description}}</p>
+          <h2><a href="{% url 'todos:detail' todo.id %}">{{ todo.title }}</a></h2>
+          <p class="description">{{ todo.description }}</p>
           <p class="priority">Priority: {{ todo.priority }}</p>
           <p class="status">Status: {{ todo.status }}</p>
-          <p class="due-date">Due Date: {{ todo.due_date }}</p>
+          <p class="due-date">Due Date: {{ todo.due_date|default:"Not set" }}</p>
+        </li>
+        {% empty %}
+        <li style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+          <p style="font-size: 1.2em; color: #738883;">No todos yet. Create your first one!</p>
         </li>
         {% endfor %}
       </ul>
     </div>
   </div>
+  
+  <a href="{% url 'todos:new' %}" class="add-todo-button" title="Add new todo">+</a>
 </div>
 {% endblock %}

@@ -97,7 +97,7 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-radius: 10px; */
+  border-radius: 10px;
 }
 
 h1 {
@@ -162,4 +162,66 @@ input[type="submit"] {
 input[type="submit"]:hover {
   color: #3CD4B3;
   background-color: white;
+}
+
+/* User greeting in navigation */
+.user-greeting {
+  color: #3CD4B3;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  background: rgba(60, 212, 179, 0.1);
+  border-radius: 4px;
+}
+
+/* Ensure navigation items align properly */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1rem;
+  align-items: center;
+}
+
+nav ul li {
+  margin: 0;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #738883;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+nav ul li a:hover {
+  background: rgba(60, 212, 179, 0.1);
+  color: #3CD4B3;
+}
+
+.login-button a,
+.register-button a,
+.logout-button a {
+  background-color: #3CD4B3;
+  color: white !important;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+
+.login-button a:hover,
+.register-button a:hover,
+.logout-button a:hover {
+  background-color: #29a17a;
 }
