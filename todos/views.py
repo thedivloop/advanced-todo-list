@@ -5,10 +5,16 @@ from django.http import HttpResponseForbidden
 from .forms import NewTodoForm, UpdateTodoForm
 from .models import Todo
 
+from django.utils import timezone
+
 @login_required
 def index(request):
-  todos = Todo.objects.filter(user=request.user)
-  return render(request, 'todos/index.html', {'todos': todos, 'current_path': request.path})
+    todos = Todo.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'todos/index.html', {
+        'todos': todos,
+        'current_path': request.path,
+        'today': timezone.now().date()
+    })
 
 @login_required
 def detail(request, pk):
