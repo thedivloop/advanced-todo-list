@@ -1,17 +1,113 @@
 {% extends 'base.html' %}
-{% block title %}Delete Todo{% endblock %} 
+{% load static %}
+
+{% block title %}Delete Todo - {{ todo.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
+{% endblock %}
 
 {% block content %}
-<h1>Are you sure you want to delete this Todo?</h1>
-<p>Title: {{ todo.title }}</p>
-<p>Description: {{ todo.description }}</p>
+<div class="delete-page">
+  <div class="delete-container">
+    <!-- Warning Header -->
+    <div class="delete-header">
+      <div class="warning-icon">⚠️</div>
+      <h1>Delete Todo?</h1>
+    </div>
 
-<form method="post">
-  {% csrf_token %}
-  <label for="confirm">Type 'yes' to confirm deletion:</label>
-  <input type="text" id="confirm" name="confirm">
-  <button type="submit">Delete</button>
-</form>
+    <!-- Delete Body -->
+    <div class="delete-body">
+      <!-- Todo Preview -->
+      <div class="todo-preview">
+        <h3>📝 {{ todo.title }}</h3>
+        {% if todo.description %}
+        <p><span class="preview-label">Description:</span> {{ todo.description }}</p>
+        {% endif %}
+        <p><span class="preview-label">Priority:</span> {{ todo.priority }}</p>
+        <p><span class="preview-label">Status:</span> {{ todo.status }}</p>
+        {% if todo.due_date %}
+        <p><span class="preview-label">Due Date:</span> {{ todo.due_date|date:"F d, Y" }}</p>
+        {% endif %}
+      </div>
 
-<a href="{% url 'todos:index' %}">Cancel</a>
+      <!-- Warning Message -->
+      <div class="delete-warning">
+        <div class="delete-warning-icon">⚠️</div>
+        <div class="delete-warning-text">
+          <strong>Warning: This action cannot be undone!</strong>
+          <p>Once deleted, this todo and all its associated data will be permanently removed.</p>
+        </div>
+      </div>
+
+      <!-- Confirmation Form -->
+      <form method="post" class="delete-form" id="delete-form">
+        {% csrf_token %}
+        
+        <div class="confirmation-input">
+          <label for="confirm">Type <strong>"yes"</strong> to confirm deletion:</label>
+          <input 
+            type="text" 
+            id="confirm" 
+            name="confirm" 
+            placeholder="Type 'yes' here"
+            autocomplete="off"
+            required
+          >
+          <span class="input-hint">This ensures you really want to delete this todo.</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="delete-actions">
+          <a href="{% url 'todos:index' %}" class="btn-cancel">
+            ← Cancel
+          </a>
+          <button type="submit" class="btn-delete" id="delete-btn" disabled>
+            🗑️ Delete Forever
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Enable/disable delete button based on confirmation input
+  const confirmInput = document.getElementById('confirm');
+  const deleteBtn = document.getElementById('delete-btn');
+  const deleteForm = document.getElementById('delete-form');
+
+  confirmInput.addEventListener('input', function() {
+    if (this.value.toLowerCase() === 'yes') {
+      deleteBtn.disabled = false;
+      deleteBtn.style.opacity = '1';
+      deleteBtn.style.cursor = 'pointer';
+    } else {
+      deleteBtn.disabled = true;
+      deleteBtn.style.opacity = '0.5';
+      deleteBtn.style.cursor = 'not-allowed';
+    }
+  });
+
+  // Prevent accidental submission
+  deleteForm.addEventListener('submit', function(e) {
+    if (confirmInput.value.toLowerCase() !== 'yes') {
+      e.preventDefault();
+      alert('Please type "yes" to confirm deletion.');
+      return false;
+    }
+    
+    // Optional: Show confirmation one more time
+    const confirmed = confirm('Are you absolutely sure you want to delete this todo?');
+    if (!confirmed) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // Focus on input when page loads
+  window.addEventListener('load', function() {
+    confirmInput.focus();
+  });
+</script>
 {% endblock %}
