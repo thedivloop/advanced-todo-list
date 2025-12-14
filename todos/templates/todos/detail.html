@@ -1,164 +1,468 @@
-{% extends 'todos/layout.html' %} 
-{% block title %}Detailed View{% endblock %} 
-{% block head %}
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <style>
-* {
-    box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ todo.title }} - Todo Detail{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
+<!-- <style>
+  .detail-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 2rem;
   }
 
-  body {
+  .detail-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .detail-header {
+    background: linear-gradient(135deg, #3CD4B3 0%, #29a17a 100%);
+    padding: 2rem;
+    color: white;
+  }
+
+  .detail-header h1 {
+    color: white;
+    font-size: 2.5em;
     margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
+    text-align: left;
   }
 
-  .main-container-detail {  
-    display: flex;
-    flex-direction: column;
-    max-width: 1200px;
-    width: 80%;
-    margin: 0 auto;
-    padding: 20px;
+  .detail-body {
+    padding: 2rem;
   }
 
-  h1 {
-    text-align: center;
+  .detail-description {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border-left: 4px solid #3CD4B3;
+  }
+
+  .detail-description h3 {
     color: #738883;
+    font-size: 1.2em;
+    margin-bottom: 0.8rem;
+  }
+
+  .detail-description p {
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .detail-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
     margin-bottom: 2rem;
   }
 
-  /* Modal Box Style */
-  .modal-box {
+  .meta-item {
+    background: #f8f9fa;
+    padding: 1.2rem;
+    border-radius: 8px;
+    border-left: 4px solid #e0e0e0;
+    transition: all 0.3s ease;
+  }
+
+  .meta-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .meta-label {
+    font-size: 0.85em;
+    color: #738883;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    border-radius: 10px;
-    background-color: white;
+    gap: 0.5rem;
+  }
+
+  .meta-value {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #333;
+  }
+
+  /* Priority Specific Styling */
+  .meta-item.priority-high {
+    border-left-color: #D57373;
+  }
+
+  .meta-item.priority-high .meta-value {
+    color: #D57373;
+  }
+
+  .meta-item.priority-medium {
+    border-left-color: #F5A623;
+  }
+
+  .meta-item.priority-medium .meta-value {
+    color: #F5A623;
+  }
+
+  .meta-item.priority-low {
+    border-left-color: #3CD4B3;
+  }
+
+  .meta-item.priority-low .meta-value {
+    color: #3CD4B3;
+  }
+
+  /* Status Specific Styling */
+  .meta-item.status-pending {
+    border-left-color: #738883;
+  }
+
+  .meta-item.status-pending .meta-value {
+    color: #738883;
+  }
+
+  .meta-item.status-in-progress {
+    border-left-color: #3CD4B3;
+  }
+
+  .meta-item.status-in-progress .meta-value {
+    color: #3CD4B3;
+  }
+
+  .meta-item.status-completed {
+    border-left-color: #4CAF50;
+  }
+
+  .meta-item.status-completed .meta-value {
+    color: #4CAF50;
+  }
+
+  /* Due Date Styling */
+  .meta-item.due-date {
+    border-left-color: #D57373;
+  }
+
+  .meta-item.due-date .meta-value {
+    color: #D57373;
+  }
+
+  /* Duration Styling */
+  .meta-item.duration {
+    border-left-color: #3CD4B3;
+  }
+
+  .meta-item.duration .meta-value {
+    color: #3CD4B3;
+  }
+
+  /* Icons for meta labels */
+  .meta-label::before {
+    font-size: 1.2em;
+  }
+
+  .priority-label::before {
+    content: "🎯";
+  }
+
+  .status-label::before {
+    content: "📊";
+  }
+
+  .due-date-label::before {
+    content: "📅";
+  }
+
+  .duration-label::before {
+    content: "⏱️";
+  }
+
+  .time-spent-label::before {
+    content: "⏳";
+  }
+
+  .time-remaining-label::before {
+    content: "⏰";
+  }
+
+  .completion-label::before {
+    content: "✅";
+  }
+
+  /* Timer Section */
+  .timer-section {
+    margin: 2rem 0;
     padding: 2rem;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    margin: 2rem auto;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
-  .modal-box h2 {
-    color: #3CD4B3;
-    font-size: 2em;
-    margin-bottom: 1rem;
-  }
-
-  .modal-box p {
-    font-size: 1.1em;
-    color: #555;
-    margin: 0.8rem 0;
-  }
-
-  .modal-box .attribute-label {
-    font-weight: bold;
+  .timer-section h3 {
     color: #738883;
+    margin-bottom: 1.5rem;
+    font-size: 1.4em;
   }
 
-  .modal-box .priority {
+  .timer-display {
+    font-size: 3.5em;
     font-weight: bold;
     color: #3CD4B3;
+    margin: 1.5rem 0;
+    font-family: 'Courier New', monospace;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  .modal-box .status {
-    font-style: italic;
-    color: #738883;
+  .timer-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
   }
 
-  .modal-box .due-date {
-    color: #D57373;
-  }
-
-  .modal-box .duration,
-  .modal-box .time-spent,
-  .modal-box .time-remaining {
-    font-size: 1em;
-    color: #3CD4B3;
-  }
-
-  .modal-box .completion-rate {
-    font-size: 1em;
+  .timer-button {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
     font-weight: bold;
-    color: #D57373;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
-  /* Action Buttons Style */
-  .modal-box .todo-buttons {
+  .start-btn {
+    background-color: #3CD4B3;
+    color: white;
+  }
+
+  .start-btn:hover {
+    background-color: #29a17a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(60, 212, 179, 0.3);
+  }
+
+  .stop-btn {
+    background-color: #D57373;
+    color: white;
+  }
+
+  .stop-btn:hover {
+    background-color: #b44d4d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(213, 115, 115, 0.3);
+  }
+
+  /* Action Buttons */
+  .todo-actions {
     display: flex;
     gap: 1rem;
     justify-content: center;
     margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e9ecef;
   }
 
-  .modal-box .todo-buttons a {
-    /* background-color: #3CD4B3; */
+  .todo-actions a {
+    flex: 1;
+    max-width: 200px;
     color: white;
-    padding: 0.7rem 1.5rem;
+    padding: 1rem 2rem;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: 8px;
     font-weight: bold;
-    transition: background-color 0.3s ease;
     text-align: center;
-    width: 120px;
-    display: inline-block;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
   }
 
-  .modal-box .edit-button:hover {
-    background-color: #29a17a;
-  }
-
-  .modal-box .edit-button {
+  .edit-button {
     background-color: #3CD4B3;
   }
 
-  .modal-box .delete-button {
+  .edit-button:hover {
+    background-color: #29a17a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(60, 212, 179, 0.3);
+  }
+
+  .delete-button {
     background-color: #D57373;
   }
 
-  .modal-box .delete-button:hover {
+  .delete-button:hover {
     background-color: #b44d4d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(213, 115, 115, 0.3);
   }
 
-  .modal-box .back-button {
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     color: #738883;
-    font-size: 1rem;
-    font-weight: normal;
-    padding: 0;
-    margin-top: 1rem;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 2rem;
+    padding: 0.5rem 0;
     transition: color 0.3s ease;
   }
 
-  .modal-box .back-button:hover {
+  .back-link:hover {
     color: #3CD4B3;
-    text-decoration: underline;
   }
-</style>
-{% endblock %} 
+
+  .back-link::before {
+    content: "←";
+    font-size: 1.2em;
+  }
+</style> -->
+{% endblock %}
 
 {% block content %}
-<div class="main-container-detail">
-  <div class="modal-box">
-    <h2>{{ todo.title }}</h2>
-    <p>{{ todo.description }}</p>
-    <p><span class="attribute-label">Description:</span> {{ todo.description }}</p>
-    <p><span class="attribute-label">Priority:</span> <span class="priority">{{ todo.priority }}</span></p>
-    <p><span class="attribute-label">Status:</span> <span class="status">{{ todo.status }}</span></p>
-    <p><span class="attribute-label">Due Date:</span> <span class="due-date">{{ todo.due_date }}</span></p>
-    <p><span class="attribute-label">Duration:</span> <span class="duration">{{ todo.duration }} minutes</span></p>
-    <p><span class="attribute-label">Time Spent:</span> <span class="time-spent">{{ todo.time_spent }} minutes</span></p>
-    <p><span class="attribute-label">Time Remaining:</span> <span class="time-remaining">{{ todo.time_remaining }} minutes</span></p>
-    <p><span class="attribute-label">Completion Rate:</span> <span class="completion-rate">{{ todo.time_completion }}%</span></p>
-    <div class="todo-buttons">
-      <a href="/todos/{{ todo.id }}/update/" class="edit-button">Edit</a>
-      <a href="/todos/{{ todo.id }}/delete/" class="delete-button">Delete</a>
+<div class="detail-container">
+  <div class="detail-card">
+    <!-- Header with Title -->
+    <div class="detail-header">
+      <h1>{{ todo.title }}</h1>
     </div>
-    <a href="/todos/" class="back-button">Back to Todos</a>
-  </div>
-</div>
-{% endblock %} 
 
+    <!-- Body Content -->
+    <div class="detail-body">
+      <!-- Description Section -->
+      {% if todo.description %}
+      <div class="detail-description">
+        <h3>Description</h3>
+        <p>{{ todo.description }}</p>
+      </div>
+      {% endif %}
+
+      <!-- Metadata Grid -->
+      <div class="detail-meta-grid">
+        <!-- Priority -->
+        <div class="meta-item priority-{{ todo.priority|lower }}">
+          <div class="meta-label priority-label">Priority</div>
+          <div class="meta-value">{{ todo.priority }}</div>
+        </div>
+
+        <!-- Status -->
+        <div class="meta-item status-{{ todo.status|lower|cut:' ' }}">
+          <div class="meta-label status-label">Status</div>
+          <div class="meta-value">{{ todo.status }}</div>
+        </div>
+
+        <!-- Due Date -->
+        <div class="meta-item due-date">
+          <div class="meta-label due-date-label">Due Date</div>
+          <div class="meta-value">{{ todo.due_date|default:"Not set" }}</div>
+        </div>
+
+        <!-- Duration -->
+        {% if todo.duration %}
+        <div class="meta-item duration">
+          <div class="meta-label duration-label">Est. Duration</div>
+          <div class="meta-value">{{ todo.duration }} min</div>
+        </div>
+        {% endif %}
+
+        <!-- Time Spent -->
+        {% if todo.time_spent %}
+        <div class="meta-item">
+          <div class="meta-label time-spent-label">Time Spent</div>
+          <div class="meta-value">{{ todo.time_spent }} min</div>
+        </div>
+        {% endif %}
+
+        <!-- Time Remaining -->
+        {% if todo.time_remaining %}
+        <div class="meta-item">
+          <div class="meta-label time-remaining-label">Time Remaining</div>
+          <div class="meta-value">{{ todo.time_remaining }} min</div>
+        </div>
+        {% endif %}
+
+        <!-- Completion Rate -->
+        {% if todo.time_completion %}
+        <div class="meta-item">
+          <div class="meta-label completion-label">Completion</div>
+          <div class="meta-value">{{ todo.time_completion }}%</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Timer Section (placeholder for Phase 1) -->
+      <div class="timer-section">
+        <h3>⏱️ Task Timer</h3>
+        <div class="timer-display" id="timer-display">00:00:00</div>
+        <div class="timer-controls">
+          <button id="start-timer" class="timer-button start-btn">Start Timer</button>
+          <button id="stop-timer" class="timer-button stop-btn" style="display: none;">Stop Timer</button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="todo-actions">
+        <a href="{% url 'todos:update' todo.id %}" class="edit-button">✏️ Edit</a>
+        <a href="{% url 'todos:delete' todo.id %}" class="delete-button">🗑️ Delete</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back Link -->
+  <a href="{% url 'todos:index' %}" class="back-link">Back to My Todos</a>
+</div>
+
+<script>
+  // Timer functionality placeholder
+  const todoId = {{ todo.id }};
+  let timerInterval = null;
+  let startTime = null;
+  let elapsedSeconds = 0;
+  
+  const startBtn = document.getElementById('start-timer');
+  const stopBtn = document.getElementById('stop-timer');
+  const timerDisplay = document.getElementById('timer-display');
+  
+  function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+  
+  function updateDisplay() {
+    const currentSeconds = elapsedSeconds + Math.floor((Date.now() - startTime) / 1000);
+    timerDisplay.textContent = formatTime(currentSeconds);
+  }
+  
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  
+  // Note: Timer functionality will be implemented in Phase 1
+  startBtn.addEventListener('click', () => {
+    alert('Timer functionality will be implemented in Phase 1!');
+  });
+</script>
+{% endblock %}

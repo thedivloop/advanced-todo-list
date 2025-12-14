@@ -1,115 +1,160 @@
-{% extends 'todos/layout.html' %} 
-{% block title %}Your Todos{% endblock %} 
-{% block head %}
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-<style>
-  * {
-    box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
-  }
+{% extends 'base.html' %}
+{% load static %}
 
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
-  }
+{% block title %}My Todos - ATLAS{% endblock %}
 
-  .main-container-index {
-    display: flex;
-    flex-direction: column;
-    max-width: 1200px;
-    width: 80%;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-
-  h1 {
-    text-align: center;
-    color: #738883;
-    margin-bottom: 2rem;
-  }
-
-  .todo-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
-        padding: 0;
-        list-style-type: none;
-    }
-
-    .todo-card {
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
-        transition: transform 0.3s ease;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .todo-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .todo-card h2 {
-        font-size: 1.6em;
-        margin-bottom: 0.8rem;
-        color: #3CD4B3;
-    }
-
-    .todo-card p {
-        margin: 0.5rem 0;
-        font-size: 1em;
-        color: #555;
-    }
-
-    .todo-card .priority {
-        font-weight: bold;
-        color: #3CD4B3;
-    }
-
-    .todo-card .status {
-        color: #738883;
-        font-style: italic;
-    }
-
-    .todo-card .due-date {
-        color: #D57373;
-        font-size: 0.9em;
-    }
-
-    .todo-card a {
-        text-decoration: none;
-        color: white;
-        background-color: #3CD4B3;
-        padding: 0.5rem;
-        border-radius: 4px;
-        font-weight: bold;
-        text-align: center;
-        transition: background-color 0.3s ease;
-        margin-top: 1rem;
-    }
-
-    .todo-card a:hover {
-        background-color: #29a17a;
-    }
-
-</style>
-{% endblock %} 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="main-container-index">
-  <ul class="todo-list">
-    {% for todo in todos %}
-    <li class="todo-card">
-      <h2><a href="{{ current_path }}{{ todo.id }}/">{{ todo.title }}</a></h2>
-      <p class="description">{{ todo.description}}</p>
-      <p class="priority">Priority: {{ todo.priority }}</p>
-      <p class="status">Status: {{ todo.status }}</p>
-      <p class="due-date">Due Date: {{ todo.due_date }}</p>
-    </li>
-    {% endfor %}
-  </ul>
+<div class="todos-page">
+  <!-- { include "partials/navbar.html" } -->
+
+  <div class="todos-content">
+    <!-- Header with Stats -->
+    <div class="todos-header">
+      <h1>✨ My Todos</h1>
+      <div class="header-stats">
+        <div class="stat-badge pending">
+          <span>⏳</span>
+          <span>{{ todos|length }} Total</span>
+        </div>
+        <div class="stat-badge active">
+          <span>🔥</span>
+          <span>{% for todo in todos %}{% if todo.status == "In Progress" %}{{ forloop.counter }}{% endif %}{% endfor %} Active</span>
+        </div>
+        <div class="stat-badge completed">
+          <span>✅</span>
+          <span>{% for todo in todos %}{% if todo.status == "Completed" %}{{ forloop.counter }}{% endif %}{% endfor %} Done</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Control Bar (Search, Filter, Sort) -->
+    <div class="control-bar">
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search todos...">
+      </div>
+      <label for="filter-status">Status:</label>
+      <select id="filter-status">
+        <option value="all">All</option>
+        <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+      <label for="sort-by">Sort by:</label>
+      <select id="sort-by">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="priority">Priority</option>
+        <option value="due-date">Due Date</option>
+      </select>
+    </div>
+
+    <!-- Todos Grid -->
+    <div class="todos-grid">
+      {% for todo in todos %}
+      <div class="todo-card priority-{{ todo.priority|lower }}" data-status="{{ todo.status|lower|cut:' ' }}" data-title="{{ todo.title|lower }}" data-created="{{ todo.created_at|date:'U' }}">
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <a href="{% url 'todos:update' todo.id %}" class="quick-action-btn edit" title="Edit">
+            ✏️
+          </a>
+          <a href="{% url 'todos:delete' todo.id %}" class="quick-action-btn delete" title="Delete">
+            🗑️
+          </a>
+        </div>
+
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="card-title">
+            <h3><a href="{% url 'todos:detail' todo.id %}">{{ todo.title }}</a></h3>
+          </div>
+          <span class="priority-badge {{ todo.priority|lower }}">
+            {{ todo.priority }}
+          </span>
+        </div>
+
+        <!-- Description -->
+        {% if todo.description %}
+        <div class="card-description">
+          {{ todo.description }}
+        </div>
+        {% endif %}
+
+        <!-- Progress Bar (if duration exists) -->
+        {% if todo.duration and todo.time_spent %}
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: {{ todo.time_completion|default:0 }}%"></div>
+        </div>
+        {% endif %}
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <span class="status-badge {{ todo.status|lower|cut:' ' }}">
+            {% if todo.status == "Pending" %}⏳{% elif todo.status == "In Progress" %}🔥{% else %}✅{% endif %}
+            {{ todo.status }}
+          </span>
+          {% if todo.due_date %}
+          <span class="due-date {% if todo.due_date < today %}overdue{% endif %}">
+            {{ todo.due_date|date:"M d" }}
+          </span>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📝</div>
+        <h2>No todos yet!</h2>
+        <p>Start organizing your tasks by creating your first todo.</p>
+        <a href="{% url 'todos:new' %}" class="btn btn-primary" style="display: inline-block; padding: 0.8rem 2rem; background: #3CD4B3; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+          ➕ Create Your First Todo
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Floating Action Button -->
+  <a href="{% url 'todos:new' %}" class="fab" title="Add new todo">+</a>
 </div>
+
+<script>
+  // Search functionality
+  const searchInput = document.getElementById('search-input');
+  const filterStatus = document.getElementById('filter-status');
+  const sortBy = document.getElementById('sort-by');
+  const todoCards = document.querySelectorAll('.todo-card');
+
+  function filterAndSort() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const statusFilter = filterStatus.value;
+    
+    // Filter cards
+    todoCards.forEach(card => {
+      const title = card.dataset.title;
+      const status = card.dataset.status;
+      
+      const matchesSearch = title.includes(searchTerm);
+      const matchesStatus = statusFilter === 'all' || status === statusFilter;
+      
+      if (matchesSearch && matchesStatus) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  searchInput.addEventListener('input', filterAndSort);
+  filterStatus.addEventListener('change', filterAndSort);
+
+  // Note: Full sorting would require server-side implementation or more complex JS
+  sortBy.addEventListener('change', () => {
+    console.log('Sorting by:', sortBy.value);
+    // Implement sorting logic or reload page with sort parameter
+  });
+</script>
+
 {% endblock %}
