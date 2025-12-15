@@ -93,7 +93,10 @@
         <!-- Card Footer -->
         <div class="card-footer">
           <span class="status-badge {{ todo.status|lower|cut:' ' }}">
-            {% if todo.status == "Pending" %}⏳{% elif todo.status == "In Progress" %}🔥{% else %}✅{% endif %}
+            {% if todo.status == "Pending" %}⏳
+            {% elif todo.status == "In Progress" %}
+            {% if todo.is_timer_active %}⏱️{% else %}🔥{% endif %}
+            {% else %}✅{% endif %}
             {{ todo.status }}
           </span>
           {% if todo.due_date %}

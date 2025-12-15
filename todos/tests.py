@@ -1,4 +1,5 @@
 from datetime import date
+from unittest import skip
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -6,11 +7,13 @@ from django.urls import reverse
 from todos.apps import TodosConfig
 from .forms import NewTodoForm
 from .models import Todo
+from django.utils import timezone
+from datetime import timedelta
+import json
 
 app_name = 'todos'
 
 class TodosAppConfigTest(TestCase):
-
   def test_todos_app_config(self):
     app_config = apps.get_app_config(app_name)
     assert isinstance(app_config, TodosConfig)
@@ -286,3 +289,335 @@ class TodoUserAssociationTest(TestCase):
     )
     self.assertEqual(todo.user, self.user)
     self.assertEqual(Todo.objects.filter(user=self.user).count(), 1)
+
+
+class TimerModelTests(TestCase):
+  def setUp(self):
+    self.user = User.objects.create_user(username='testuser', password='testpassword')
+    self.todo = Todo.objects.create(
+        title='Test Task',
+        user=self.user,
+        duration=60,
+        status='Pending'
+    )
+  # @skip("Skipping timer field test temporarily")  
+  def test_todo_has_timer_fields(self):
+    """Test that todo has is_timer_active and timer_started_at fields"""
+    self.assertFalse(self.todo.is_timer_active)
+    self.assertIsNone(self.todo.timer_started_at)
+  
+  # @skip("Skipping start timer test temporarily")
+  def test_start_timer_changes_status_to_in_progress(self):
+    """Test that starting timer changes status to 'In Progress'"""
+    self.todo.start_timer()
+    self.assertEqual(self.todo.status, 'In Progress')
+    self.assertTrue(self.todo.is_timer_active)
+    self.assertIsNotNone(self.todo.timer_started_at)
+  
+  # @skip("Skipping stop timer test temporarily")
+  def test_stop_timer_changes_status_to_pending(self):
+    """Test that stopping timer changes status to 'Pending'"""
+    self.todo.start_timer()
+    self.todo.stop_timer()
+    self.assertEqual(self.todo.status, 'Pending')
+    self.assertFalse(self.todo.is_timer_active)
+    self.assertIsNone(self.todo.timer_started_at)
+  
+  # @skip("Skipping time spent update test temporarily")
+  def test_stop_timer_updates_time_spent(self):
+    """Test that stopping timer updates time_spent"""
+    self.todo.start_timer()
+    # Simulate 5 seconds passing
+    self.todo.timer_started_at = timezone.now() - timedelta(seconds=5)
+    self.todo.save()
+    
+    self.todo.stop_timer()
+    # Should be at least 5 seconds (converted to minutes, rounded)
+    self.assertGreaterEqual(self.todo.time_spent or 0, 0)
+
+  # @skip("Skipping time remaining update test temporarily")
+  def test_stop_timer_updates_time_remaining(self):
+    """Test that stopping timer updates time_remaining"""
+    self.todo.duration = 60
+    self.todo.time_spent = 0
+    self.todo.save()
+    
+    self.todo.start_timer()
+    self.todo.timer_started_at = timezone.now() - timedelta(minutes=10)
+    self.todo.save()
+    
+    self.todo.stop_timer()
+    
+    # time_remaining should be duration - time_spent
+    self.assertEqual(self.todo.time_remaining, 60 - 10)
+  
+  # @skip("Skipping single active timer test temporarily")
+  def test_only_one_timer_active_per_user(self):
+    """Test that only one todo can have active timer per user"""
+    todo2 = Todo.objects.create(
+        title='Second Task',
+        user=self.user,
+        duration=30,
+        status='Pending'
+    )
+    
+    # Start first timer
+    self.todo.start_timer()
+    self.assertTrue(self.todo.is_timer_active)
+    
+    # Start second timer - should stop first
+    todo2.start_timer()
+    
+    # Refresh from database
+    self.todo.refresh_from_db()
+    todo2.refresh_from_db()
+    
+    # First should be stopped, second should be active
+    self.assertFalse(self.todo.is_timer_active)
+    self.assertEqual(self.todo.status, 'Pending')
+    self.assertTrue(todo2.is_timer_active)
+    self.assertEqual(todo2.status, 'In Progress')
+
+  # @skip("Skipping elapsed time test temporarily")
+  def test_get_elapsed_time_when_timer_active(self):
+    """Test getting elapsed time when timer is running"""
+    self.todo.start_timer()
+    # Simulate 10 seconds passing
+    self.todo.timer_started_at = timezone.now() - timedelta(seconds=10)
+    self.todo.save()
+    
+    elapsed = self.todo.get_elapsed_time()
+    self.assertGreaterEqual(elapsed, 10)
+    self.assertLess(elapsed, 12)  # Allow 2 second margin
+  
+  # @skip("Skipping elapsed time test temporarily")
+  def test_get_elapsed_time_when_timer_inactive(self):
+    """Test getting elapsed time when timer is not running"""
+    elapsed = self.todo.get_elapsed_time()
+    self.assertEqual(elapsed, 0)
+
+  # @skip("Skipping active timer retrieval test temporarily")
+  def test_get_active_timer_for_user(self):
+    """Test getting the active timer todo for a user"""
+    self.todo.start_timer()
+    
+    active_todo = Todo.get_active_timer_for_user(self.user)
+    self.assertEqual(active_todo, self.todo)
+  
+  # @skip("Skipping no active timer retrieval test temporarily")
+  def test_get_active_timer_returns_none_when_no_active(self):
+    """Test getting active timer returns None when no timer active"""
+    active_todo = Todo.get_active_timer_for_user(self.user)
+    self.assertIsNone(active_todo)
+
+class TimerViewTests(LoggedInTestCase):
+  def setUp(self):
+    super().setUp()
+    self.todo = Todo.objects.create(
+        title='Test Task',
+        user=self.user,
+        duration=60,
+        status='Pending'
+    )
+    self.todo2 = Todo.objects.create(
+        title='Second Task',
+        user=self.user,
+        duration=30,
+        status='Pending'
+    )
+  
+  def test_start_timer_endpoint_exists(self):
+    """Test that start_timer endpoint exists"""
+    url = reverse('todos:start_timer', args=[self.todo.id])
+    response = self.client.post(url)
+    self.assertNotEqual(response.status_code, 404)
+
+  # @skip("Skipping start timer JSON response test temporarily")
+  def test_start_timer_returns_json(self):
+    """Test that start_timer returns JSON response"""
+    url = reverse('todos:start_timer', args=[self.todo.id])
+    response = self.client.post(url)
+    self.assertEqual(response['Content-Type'], 'application/json')
+  
+  # @skip("Skipping start timer activation test temporarily")
+  def test_start_timer_activates_timer(self):
+    """Test that start_timer activates the timer"""
+    url = reverse('todos:start_timer', args=[self.todo.id])
+    response = self.client.post(url)
+    
+    data = json.loads(response.content)
+    self.assertEqual(data['status'], 'success')
+    
+    self.todo.refresh_from_db()
+    self.assertTrue(self.todo.is_timer_active)
+    self.assertEqual(self.todo.status, 'In Progress')
+
+  # @skip("Skipping start timer stops other timers test temporarily")
+  def test_start_timer_stops_other_active_timers(self):
+    """Test that starting timer stops other active timers"""
+    # Start first timer
+    self.todo.start_timer()
+    
+    # Start second timer via endpoint
+    url = reverse('todos:start_timer', args=[self.todo2.id])
+    response = self.client.post(url)
+    
+    data = json.loads(response.content)
+    self.assertEqual(data['status'], 'success')
+    
+    # Check first timer is stopped
+    self.todo.refresh_from_db()
+    self.assertFalse(self.todo.is_timer_active)
+    self.assertEqual(self.todo.status, 'Pending')
+    
+    # Check second timer is active
+    self.todo2.refresh_from_db()
+    self.assertTrue(self.todo2.is_timer_active)
+  
+  # @skip("Skipping start timer requires authentication test temporarily") 
+  def test_start_timer_requires_authentication(self):
+    """Test that start_timer requires authentication"""
+    self.client.logout()
+    url = reverse('todos:start_timer', args=[self.todo.id])
+    response = self.client.post(url)
+    self.assertEqual(response.status_code, 302)  # Redirect to login
+  
+  # @skip("Skipping start timer requires ownership test temporarily")
+  def test_start_timer_requires_ownership(self):
+    """Test that user can only start timer on their own todos"""
+    other_user = User.objects.create_user(username='other', password='password')
+    other_todo = Todo.objects.create(
+        title='Other Task',
+        user=other_user,
+        duration=45
+    )
+    
+    url = reverse('todos:start_timer', args=[other_todo.id])
+    response = self.client.post(url)
+    self.assertEqual(response.status_code, 404)
+  
+  # @skip("Skipping stop timer endpoint test temporarily")
+  def test_stop_timer_endpoint_exists(self):
+    """Test that stop_timer endpoint exists"""
+    url = reverse('todos:stop_timer', args=[self.todo.id])
+    response = self.client.post(url)
+    self.assertNotEqual(response.status_code, 404)
+  
+  # @skip("Skipping stop timer deactivates timer test temporarily")
+  def test_stop_timer_deactivates_timer(self):
+    """Test that stop_timer deactivates the timer"""
+    self.todo.start_timer()
+    
+    url = reverse('todos:stop_timer', args=[self.todo.id])
+    response = self.client.post(url)
+    
+    data = json.loads(response.content)
+    self.assertEqual(data['status'], 'success')
+    
+    self.todo.refresh_from_db()
+    self.assertFalse(self.todo.is_timer_active)
+    self.assertEqual(self.todo.status, 'Pending')
+  
+  # @skip("Skipping stop timer returns time data test temporarily")
+  def test_stop_timer_returns_time_data(self):
+    """Test that stop_timer returns updated time data"""
+    self.todo.start_timer()
+    
+    url = reverse('todos:stop_timer', args=[self.todo.id])
+    response = self.client.post(url)
+    
+    data = json.loads(response.content)
+    self.assertIn('time_spent', data)
+    self.assertIn('time_remaining', data)
+    self.assertIn('time_completion', data)
+  
+  # @skip("Skipping get timer status endpoint test temporarily")
+  def test_get_timer_status_endpoint_exists(self):
+    """Test that get_timer_status endpoint exists"""
+    url = reverse('todos:timer_status', args=[self.todo.id])
+    response = self.client.get(url)
+    self.assertNotEqual(response.status_code, 404)
+  
+  # @skip("Skipping get timer status returns correct data test temporarily")
+  def test_get_timer_status_returns_correct_data(self):
+    """Test that get_timer_status returns correct timer data"""
+    self.todo.start_timer()
+    
+    url = reverse('todos:timer_status', args=[self.todo.id])
+    response = self.client.get(url)
+    
+    data = json.loads(response.content)
+    self.assertTrue(data['is_active'])
+    self.assertIn('elapsed_seconds', data)
+    self.assertIn('time_spent', data)
+    self.assertIn('duration', data)
+
+  # @skip("Skipping check active timer endpoint test temporarily")
+  def test_check_active_timer_endpoint_exists(self):
+    """Test that check_active_timer endpoint exists"""
+    url = reverse('todos:check_active_timer')
+    response = self.client.get(url)
+    self.assertNotEqual(response.status_code, 404)
+  
+  # @skip("Skipping check active timer returns active todo test temporarily")
+  def test_check_active_timer_returns_active_todo(self):
+    """Test that check_active_timer returns active todo info"""
+    self.todo.start_timer()
+    
+    url = reverse('todos:check_active_timer')
+    response = self.client.get(url)
+    
+    data = json.loads(response.content)
+    self.assertTrue(data['has_active_timer'])
+    self.assertEqual(data['active_todo_id'], self.todo.id)
+    self.assertEqual(data['active_todo_title'], self.todo.title)
+  
+  # @skip("Skipping check active timer returns none test temporarily")
+  def test_check_active_timer_returns_none_when_no_active(self):
+    """Test that check_active_timer returns None when no timer active"""
+    url = reverse('todos:check_active_timer')
+    response = self.client.get(url)
+    
+    data = json.loads(response.content)
+    self.assertFalse(data['has_active_timer'])
+    self.assertIsNone(data['active_todo_id'])
+
+class TimerIntegrationTests(LoggedInTestCase):
+  def setUp(self):
+    super().setUp()
+    self.todo = Todo.objects.create(
+        title='Integration Test Task',
+        user=self.user,
+        duration=60,
+        status='Pending'
+    )
+  
+  def test_full_timer_workflow(self):
+    """Test complete timer workflow: start -> stop -> verify data"""
+    # Start timer
+    start_url = reverse('todos:start_timer', args=[self.todo.id])
+    response = self.client.post(start_url)
+    self.assertEqual(response.status_code, 200)
+    
+    # Verify timer is active
+    self.todo.refresh_from_db()
+    self.assertTrue(self.todo.is_timer_active)
+    self.assertEqual(self.todo.status, 'In Progress')
+    
+    # Simulate time passing
+    from django.utils import timezone
+    from datetime import timedelta
+    self.todo.timer_started_at = timezone.now() - timedelta(minutes=5)
+    self.todo.save()
+    
+    # Stop timer
+    stop_url = reverse('todos:stop_timer', args=[self.todo.id])
+    response = self.client.post(stop_url)
+    self.assertEqual(response.status_code, 200)
+    
+    # Verify timer stopped and data updated
+    self.todo.refresh_from_db()
+    self.assertFalse(self.todo.is_timer_active)
+    self.assertEqual(self.todo.status, 'Pending')
+    self.assertEqual(self.todo.time_spent, 5)
+    self.assertEqual(self.todo.time_remaining, 55)

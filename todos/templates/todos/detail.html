@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
-<!-- <style>
+<style>
   .detail-container {
     max-width: 900px;
     margin: 2rem auto;
@@ -326,7 +326,7 @@
     content: "←";
     font-size: 1.2em;
   }
-</style> -->
+</style>
 {% endblock %}
 
 {% block content %}
@@ -379,7 +379,7 @@
         {% if todo.time_spent %}
         <div class="meta-item">
           <div class="meta-label time-spent-label">Time Spent</div>
-          <div class="meta-value">{{ todo.time_spent }} min</div>
+          <div id="time-spent" class="meta-value">{{ todo.time_spent }} min</div>
         </div>
         {% endif %}
 
@@ -387,7 +387,7 @@
         {% if todo.time_remaining %}
         <div class="meta-item">
           <div class="meta-label time-remaining-label">Time Remaining</div>
-          <div class="meta-value">{{ todo.time_remaining }} min</div>
+          <div id="time-remaining" class="meta-value">{{ todo.time_remaining }} min</div>
         </div>
         {% endif %}
 
@@ -400,15 +400,166 @@
         {% endif %}
       </div>
 
-      <!-- Timer Section (placeholder for Phase 1) -->
-      <div class="timer-section">
-        <h3>⏱️ Task Timer</h3>
-        <div class="timer-display" id="timer-display">00:00:00</div>
-        <div class="timer-controls">
-          <button id="start-timer" class="timer-button start-btn">Start Timer</button>
-          <button id="stop-timer" class="timer-button stop-btn" style="display: none;">Stop Timer</button>
-        </div>
-      </div>
+
+      <!-- Timer Section -->
+<div class="timer-section">
+  <h3>⏱️ Task Timer</h3>
+  <div class="timer-display" id="timer-display">00:00:00</div>
+  
+  <div class="timer-controls">
+    <button id="start-timer" class="timer-button start-btn">Start Timer</button>
+    <button id="stop-timer" class="timer-button stop-btn" style="display: none;">Stop Timer</button>
+  </div>
+</div>
+
+<script>
+const todoId = {{ todo.id }};
+let timerInterval = null;
+let startTime = null;
+let elapsedSeconds = 0;
+
+const startBtn = document.getElementById('start-timer');
+const stopBtn = document.getElementById('stop-timer');
+const timerDisplay = document.getElementById('timer-display');
+
+function formatTime(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function updateDisplay() {
+  const currentSeconds = elapsedSeconds + Math.floor((Date.now() - startTime) / 1000);
+  timerDisplay.textContent = formatTime(currentSeconds);
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+async function checkForActiveTimer() {
+  try {
+    const response = await fetch('/todos/timer/check-active/');
+    const data = await response.json();
+    
+    if (data.has_active_timer && data.active_todo_id !== todoId) {
+      return {
+        hasActive: true,
+        todoId: data.active_todo_id,
+        todoTitle: data.active_todo_title
+      };
+    }
+    return { hasActive: false };
+  } catch (error) {
+    console.error('Error checking active timer:', error);
+    return { hasActive: false };
+  }
+}
+
+startBtn.addEventListener('click', async () => {
+  try {
+    // Check if another timer is active
+    const activeCheck = await checkForActiveTimer();
+    
+    if (activeCheck.hasActive) {
+      const confirmSwitch = confirm(
+        `You have an active timer running on "${activeCheck.todoTitle}". \n\n` +
+        `Starting this timer will pause the other task and set it to "Pending". \n\n` +
+        `Do you want to continue?`
+      );
+      
+      if (!confirmSwitch) {
+        return;
+      }
+    }
+    
+    const response = await fetch(`/todos/${todoId}/timer/start/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      startTime = Date.now();
+      timerInterval = setInterval(updateDisplay, 1000);
+      startBtn.style.display = 'none';
+      stopBtn.style.display = 'block';
+      
+      // Reload to update status
+      setTimeout(() => location.reload(), 500);
+    }
+  } catch (error) {
+    console.error('Error starting timer:', error);
+    alert('Failed to start timer. Please try again.');
+  }
+});
+
+stopBtn.addEventListener('click', async () => {
+  try {
+    const response = await fetch(`/todos/${todoId}/timer/stop/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      clearInterval(timerInterval);
+      const data = await response.json();
+      
+      document.getElementById('time-spent').textContent = `${data.time_spent || 0} min`;
+      document.getElementById('time-remaining').textContent = `${data.time_remaining || 0} min`;
+      
+      elapsedSeconds = 0;
+      timerDisplay.textContent = '00:00:00';
+      startBtn.style.display = 'block';
+      stopBtn.style.display = 'none';
+      
+      // Reload to show updated status
+      setTimeout(() => location.reload(), 1000);
+    }
+  } catch (error) {
+    console.error('Error stopping timer:', error);
+    alert('Failed to stop timer. Please try again.');
+  }
+});
+
+// Check timer status on page load
+async function checkTimerStatus() {
+  try {
+    const response = await fetch(`/todos/${todoId}/timer/status/`);
+    const data = await response.json();
+    
+    if (data.is_active) {
+      elapsedSeconds = data.elapsed_seconds;
+      startTime = Date.now();
+      timerInterval = setInterval(updateDisplay, 1000);
+      startBtn.style.display = 'none';
+      stopBtn.style.display = 'block';
+      updateDisplay();
+    }
+  } catch (error) {
+    console.error('Error checking timer status:', error);
+  }
+}
+
+checkTimerStatus();
+</script>
 
       <!-- Action Buttons -->
       <div class="todo-actions">
@@ -421,48 +572,4 @@
   <!-- Back Link -->
   <a href="{% url 'todos:index' %}" class="back-link">Back to My Todos</a>
 </div>
-
-<script>
-  // Timer functionality placeholder
-  const todoId = {{ todo.id }};
-  let timerInterval = null;
-  let startTime = null;
-  let elapsedSeconds = 0;
-  
-  const startBtn = document.getElementById('start-timer');
-  const stopBtn = document.getElementById('stop-timer');
-  const timerDisplay = document.getElementById('timer-display');
-  
-  function formatTime(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  }
-  
-  function updateDisplay() {
-    const currentSeconds = elapsedSeconds + Math.floor((Date.now() - startTime) / 1000);
-    timerDisplay.textContent = formatTime(currentSeconds);
-  }
-  
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-  
-  // Note: Timer functionality will be implemented in Phase 1
-  startBtn.addEventListener('click', () => {
-    alert('Timer functionality will be implemented in Phase 1!');
-  });
-</script>
 {% endblock %}
