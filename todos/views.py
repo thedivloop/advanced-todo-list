@@ -1,21 +1,35 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
-from django.http import JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST, require_http_methods
 
-from .forms import NewTodoForm, UpdateTodoForm
-from .models import Todo
+from .forms import NewTodoForm, UpdateTodoForm, TaskGroupForm
+from .models import Todo, TaskGroup
 
 from django.utils import timezone
 
 @login_required
 def index(request):
   todos = Todo.objects.filter(user=request.user).order_by('-created_at')
+  # Filter by group if specified
+  group_filter = request.GET.get('group')
+  if group_filter:
+    if group_filter == 'none':
+      todos = todos.filter(group__isnull=True)
+    else:
+      todos = todos.filter(group_id=group_filter)
+  
+  todos = todos.order_by('-created_at')
+
+  # Get all groups for filter dropdown
+  groups = TaskGroup.objects.filter(user=request.user)
+
   return render(request, 'todos/index.html', {
       'todos': todos,
+      'groups': groups,
       'current_path': request.path,
-      'today': timezone.now().date()
+      'today': timezone.now().date(),
+      'selected_group': group_filter
   })
 
 @login_required
@@ -128,3 +142,54 @@ def check_active_timer(request):
         'active_todo_id': None,
         'active_todo_title': None
     })
+
+@login_required
+def groups_list(request):
+  groups = TaskGroup.objects.filter(user=request.user)
+  return render(request, 'todos/groups_list.html', {'groups': groups})
+
+
+@login_required
+def create_group(request):
+  """Create a new task group"""
+  if request.method == 'POST':
+    form = TaskGroupForm(request.POST, user=request.user)
+    if form.is_valid():
+      group = form.save(commit=False)
+      group.user = request.user
+      group.save()
+      return redirect('todos:groups_list')
+  else:
+    form = TaskGroupForm(user=request.user)
+
+  return render(request, 'todos/create_group.html', {'form': form})
+
+@login_required
+def group_detail(request, pk):
+  group = get_object_or_404(TaskGroup, pk=pk, user=request.user)
+  todos = group.todos.filter(user=request.user).order_by('-created_at')
+  return render(request, 'todos/group_detail.html', {'group': group, 'todos': todos})
+
+@login_required
+def update_group(request, pk):
+  group = get_object_or_404(TaskGroup, pk=pk, user=request.user)
+  if request.method == 'POST':
+    form = TaskGroupForm(request.POST, instance=group, user=request.user)
+    if form.is_valid():
+      form.save()
+      return redirect('todos:groups_list')
+  else:
+    form = TaskGroupForm(instance=group, user=request.user)
+  
+  return render(request, 'todos/update_group.html', {'form': form, 'group': group})
+
+@login_required
+def delete_group(request, pk):
+  group = get_object_or_404(TaskGroup, pk=pk, user=request.user)
+  if request.method == 'POST':
+    is_confirmed = request.POST.get('confirm', '').lower() == 'yes'
+    if is_confirmed:
+      group.delete()
+    return redirect('todos:groups_list')
+  
+  return render(request, 'todos/delete_group.html', {'group': group})

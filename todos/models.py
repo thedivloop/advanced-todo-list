@@ -4,6 +4,7 @@ from django.utils import timezone
 
 # Create your models here.
 
+
 class Todo(models.Model):
 
   PRIORITY_CHOICES = (
@@ -18,6 +19,7 @@ class Todo(models.Model):
   )
 
   user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='todos', default=None)
+  group = models.ForeignKey('TaskGroup', on_delete=models.SET_NULL, null=True, blank=True, related_name='todos')
 
   title = models.CharField(max_length=255)
   description = models.TextField(blank=True, null=True)
@@ -91,3 +93,18 @@ class Todo(models.Model):
       return cls.objects.get(user=user, is_timer_active=True)
     except cls.DoesNotExist:
       return None
+    
+class TaskGroup(models.Model):
+  name = models.CharField(max_length=100)
+  description = models.TextField(blank=True, null=True)
+  color = models.CharField(max_length=7, default='#3CD4B3')
+  user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_groups')
+  # todos = models.ManyToManyField(Todo, related_name='task_groups', blank=True)
+  created_at = models.DateTimeField(auto_now_add=True)
+
+  class Meta:
+        unique_together = ['user', 'name']
+        ordering = ['name']
+
+  def __str__(self):
+    return self.name

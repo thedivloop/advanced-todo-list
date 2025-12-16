@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}New Todo{% endblock %} 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
+{% endblock %}
 {% block content %}
+{% include "partials/navbar.html" %}
 <div class="modal-box">
   <h1>New Todo</h1>
   <form action="" method="post">

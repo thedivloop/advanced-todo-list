@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete {{ group.name }} - ATLAS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include "partials/navbar.html" %}
+<div class="delete-page">
+  <div class="delete-container">
+    <div class="delete-header">
+      <div class="warning-icon">⚠️</div>
+      <h1>Delete Group?</h1>
+    </div>
+
+    <div class="delete-body">
+      <div class="todo-preview">
+        <h3>📁 {{ group.name }}</h3>
+        {% if group.description %}
+        <p><span class="preview-label">Description:</span> {{ group.description }}</p>
+        {% endif %}
+        <p><span class="preview-label">Tasks in group:</span> {{ group.todos.count }}</p>
+      </div>
+
+      <div class="delete-warning">
+        <div class="delete-warning-icon">⚠️</div>
+        <div class="delete-warning-text">
+          <strong>Important:</strong>
+          <p>Deleting this group will not delete the tasks. Tasks will become ungrouped.</p>
+        </div>
+      </div>
+
+      <form method="post" class="delete-form">
+        {% csrf_token %}
+        <div class="confirmation-input">
+          <label for="confirm">Type <strong>"yes"</strong> to confirm deletion:</label>
+          <input type="text" id="confirm" name="confirm" placeholder="Type 'yes' here" autocomplete="off" required>
+        </div>
+
+        <div class="delete-actions">
+          <a href="{% url 'todos:groups_list' %}" class="btn-cancel">← Cancel</a>
+          <button type="submit" class="btn-delete" id="delete-btn" disabled>🗑️ Delete Group</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const confirmInput = document.getElementById('confirm');
+  const deleteBtn = document.getElementById('delete-btn');
+
+  confirmInput.addEventListener('input', function() {
+    if (this.value.toLowerCase() === 'yes') {
+      deleteBtn.disabled = false;
+      deleteBtn.style.opacity = '1';
+    } else {
+      deleteBtn.disabled = true;
+      deleteBtn.style.opacity = '0.5';
+    }
+  });
+
+  confirmInput.focus();
+</script>
+{% endblock %}

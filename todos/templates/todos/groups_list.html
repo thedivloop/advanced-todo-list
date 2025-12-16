@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Task Groups - ATLAS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
+<style>
+  .groups-page {
+    min-height: calc(100vh - 80px);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem;
+  }
+
+  .groups-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .groups-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .groups-header h1 {
+    color: #2c3e50;
+    font-size: 2.5em;
+    margin: 0;
+  }
+
+  .btn-create-group {
+    background: linear-gradient(135deg, #3CD4B3 0%, #29a17a 100%);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-create-group:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(60, 212, 179, 0.3);
+  }
+
+  .groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  }
+  .group-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  }
+  .group-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: var(--group-color);
+  }
+  .group-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  .group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  }
+  .group-name {
+  font-size: 1.5em;
+  color: #2c3e50;
+  margin: 0;
+  }
+  .group-actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  }
+  .group-card:hover .group-actions {
+  opacity: 1;
+  }
+  .group-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  }
+  .group-action-btn:hover {
+  transform: scale(1.1);
+  }
+  .group-description {
+  color: #6c757d;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  }
+  .group-stats {
+  display: flex;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+  }
+  .group-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9em;
+  color: #6c757d;
+  }
+  .empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "partials/navbar.html" %}
+<div class="groups-page">
+  <div class="groups-container">
+    <!-- Header -->
+    <div class="groups-header">
+      <h1>📁 Task Groups</h1>
+      <a href="{% url 'todos:create_group' %}" class="btn-create-group">
+        ➕ Create Group
+      </a>
+    </div>
+  <!-- Groups Grid -->
+    <div class="groups-grid">
+      {% for group in groups %}
+      <div class="group-card" style="--group-color: {{ group.color }};" onclick="window.location='{% url 'todos:group_detail' group.id %}'">
+        <div class="group-header">
+          <h3 class="group-name">{{ group.name }}</h3>
+          <div class="group-actions" onclick="event.stopPropagation();">
+            <a href="{% url 'todos:update_group' group.id %}" class="group-action-btn" title="Edit">✏️</a>
+            <a href="{% url 'todos:delete_group' group.id %}" class="group-action-btn" title="Delete">🗑️</a>
+          </div>
+        </div>
+        
+        {% if group.description %}
+        <p class="group-description">{{ group.description }}</p>
+        {% endif %}
+        
+        <div class="group-stats">
+          <span class="group-stat">
+            📋 {{ group.todos.count }} task{{ group.todos.count|pluralize }}
+          </span>
+          <span class="group-stat">
+            🎨 <div style="width: 20px; height: 20px; background: {{ group.color }}; border-radius: 4px;"></div>
+          </span>
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty-state">
+        <div style="font-size: 5em; margin-bottom: 1rem; opacity: 0.5;">📁</div>
+        <h2 style="color: #738883; margin-bottom: 1rem;">No Groups Yet!</h2>
+        <p style="color: #6c757d; margin-bottom: 2rem; font-size: 1.1em;">
+          Create groups to organize your tasks better.
+        </p>
+        <a href="{% url 'todos:create_group' %}" class="btn-create-group">
+          ➕ Create Your First Group
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+

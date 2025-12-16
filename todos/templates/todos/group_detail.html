@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ group.name }} - ATLAS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include "partials/navbar.html" %}
+<div class="todos-page">
+  <div class="todos-content" style="margin-left: 0; max-width: 100%;">
+    <!-- Group Header -->
+    <div class="todos-header" style="border-left: 5px solid {{ group.color }}; padding-left: 1rem;">
+      <div>
+        <h1>📁 {{ group.name }}</h1>
+        {% if group.description %}
+        <p style="color: #6c757d; margin-top: 0.5rem;">{{ group.description }}</p>
+        {% endif %}
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <a href="{% url 'todos:update_group' group.id %}" style="padding: 0.6rem 1.2rem; background: #3CD4B3; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+          ✏️ Edit Group
+        </a>
+        <a href="{% url 'todos:groups_list' %}" style="padding: 0.6rem 1.2rem; background: #e9ecef; color: #495057; text-decoration: none; border-radius: 6px; font-weight: bold;">
+          ← Back to Groups
+        </a>
+      </div>
+    </div>
+
+    <!-- Todos Grid -->
+    <div class="todos-grid">
+      {% for todo in todos %}
+      <div class="todo-card priority-{{ todo.priority|lower }}">
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <a href="{% url 'todos:update' todo.id %}" class="quick-action-btn edit" title="Edit">✏️</a>
+          <a href="{% url 'todos:delete' todo.id %}" class="quick-action-btn delete" title="Delete">🗑️</a>
+        </div>
+
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="card-title">
+            <h3><a href="{% url 'todos:detail' todo.id %}">{{ todo.title }}</a></h3>
+          </div>
+          <span class="priority-badge {{ todo.priority|lower }}">{{ todo.priority }}</span>
+        </div>
+
+        <!-- Description -->
+        {% if todo.description %}
+        <div class="card-description">{{ todo.description }}</div>
+        {% endif %}
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <span class="status-badge {{ todo.status|lower|cut:' ' }}">
+            {% if todo.status == "Pending" %}⏳{% elif todo.status == "In Progress" %}🔥{% else %}✅{% endif %}
+            {{ todo.status }}
+          </span>
+          {% if todo.due_date %}
+          <span class="due-date">{{ todo.due_date|date:"M d" }}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📝</div>
+        <h2>No tasks in this group yet!</h2>
+        <p>Create a new task and assign it to this group.</p>
+        <a href="{% url 'todos:new' %}" class="btn btn-primary" style="display: inline-block; padding: 0.8rem 2rem; background: #3CD4B3; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+          ➕ Create Task
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

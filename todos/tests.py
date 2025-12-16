@@ -621,3 +621,425 @@ class TimerIntegrationTests(LoggedInTestCase):
     self.assertEqual(self.todo.status, 'Pending')
     self.assertEqual(self.todo.time_spent, 5)
     self.assertEqual(self.todo.time_remaining, 55)
+
+class TaskGroupModelTests(TestCase):
+  def setUp(self):
+    self.user = User.objects.create_user(username='testuser', password='testpassword')
+    self.other_user = User.objects.create_user(username='otheruser', password='password')
+
+  # @skip("Skipping TaskGroup model existence test temporarily")
+  def test_task_group_model_exists(self):
+    from todos.models import TaskGroup
+    self.assertIsNotNone(TaskGroup)
+  
+  # @skip("Skipping TaskGroup creation test temporarily")
+  def test_create_task_group(self):
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.create(name='Work', description='Work related tasks', user=self.user)
+    self.assertEqual(group.name, 'Work')
+    self.assertEqual(group.description, 'Work related tasks')
+    self.assertEqual(group.user, self.user)
+    self.assertIsNotNone(group.created_at)
+
+  # @skip("Skipping TaskGroup string representation test temporarily")
+  def test_task_group_str_representation(self):
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.create(name='Personal', user=self.user)
+    self.assertEqual(str(group), 'Personal')
+
+  # @skip("Skipping TaskGroup user association test temporarily")
+  def test_task_group_has_color_field(self):
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.create(name='Chores', user=self.user)
+    self.assertTrue(hasattr(group, 'color'))
+
+  # @skip("Skipping TaskGroup unique per user test temporarily")
+  def test_task_group_unique_per_user(self):
+    from todos.models import TaskGroup
+    from django.db import IntegrityError
+
+    TaskGroup.objects.create(name='Work', user=self.user)
+
+    with self.assertRaises(IntegrityError):
+      TaskGroup.objects.create(name='Work', user=self.user)
+
+  # @skip("Skipping TaskGroup same name different users test temporarily")
+  def test_different_users_can_have_same_group_name(self):
+    from todos.models import TaskGroup
+
+    TaskGroup.objects.create(name='Hobbies', user=self.user)
+    TaskGroup.objects.create(name='Hobbies', user=self.other_user)
+
+    group1 = TaskGroup.objects.get(name='Hobbies', user=self.user)
+    group2 = TaskGroup.objects.get(name='Hobbies', user=self.other_user)
+
+    self.assertEqual(group1.name, group2.name)
+    self.assertNotEqual(group1.user, group2.user)
+
+  # @skip("Skipping TaskGroup created_at field test temporarily")
+  def test_task_group_has_created_at(self):
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.create(name='Errands', user=self.user)
+    self.assertIsNotNone(group.created_at)
+
+  # @skip("Skipping delete user deletes groups test temporarily")
+  def test_delete_user_deletes_groups(self):
+    from todos.models import TaskGroup
+    TaskGroup.objects.create(name='Temporary', user=self.user)
+    TaskGroup.objects.create(name='Another Temp', user=self.user)
+
+    self.assertEqual(TaskGroup.objects.filter(user=self.user).count(), 2)
+    self.user.delete()
+    self.user.save()
+    self.assertEqual(TaskGroup.objects.filter(user=self.user).count(), 0)
+
+class TodoGroupAssignmentTests(TestCase):
+  def setUp(self):
+    self.user = User.objects.create_user(username='testuser', password='testpassword')
+
+  # @skip("Skipping todo group field test temporarily")
+  def test_todo_has_an_optional_group_field(self):
+    todo = Todo.objects.create(
+            title='Test Task',
+            user=self.user
+        )
+    self.assertIsNone(todo.group)
+
+  # @skip("Skipping assign todo to group test temporarily")
+  def test_assign_todo_to_group(self):
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.create(name='Work', user=self.user)
+    todo = Todo.objects.create(
+            title='Test Task',
+            group=group,
+            user=self.user
+        )
+    self.assertEqual(todo.group, group)
+
+  # @skip("Skipping group can have multiple todos test temporarily")
+  def test_group_can_have_multiple_todos(self):
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.create(name='Personal', user=self.user)
+    
+    todo1 = Todo.objects.create(
+            title='Task 1',
+            group=group,
+            user=self.user
+        )
+    todo2 = Todo.objects.create(
+            title='Task 2',
+            group=group,
+            user=self.user
+        )
+    
+    todos_in_group = group.todos.all()
+    self.assertIn(todo1, todos_in_group)
+    self.assertIn(todo2, todos_in_group)
+    self.assertEqual(todos_in_group.count(), 2)
+
+  # @skip("Skipping delete group sets todos group to null test temporarily")
+  def test_delete_group_sets_todos_group_to_null(self):
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.create(name='Chores', user=self.user)
+    
+    todo = Todo.objects.create(
+            title='Clean the house',
+            group=group,
+            user=self.user
+        )
+    
+    self.assertEqual(todo.group, group)
+    
+    group.delete()
+    
+    todo.refresh_from_db()
+    self.assertIsNone(todo.group)
+    self.assertTrue(Todo.objects.filter(id=todo.id).exists())
+
+  # @skip("Skipping filter todos by group test temporarily")
+  def test_filter_todos_by_group(self):
+    from todos.models import TaskGroup
+    group1 = TaskGroup.objects.create(name='Work', user=self.user)
+    group2 = TaskGroup.objects.create(name='Personal', user=self.user)
+    
+    todo1 = Todo.objects.create(
+            title='Work Task 1',
+            group=group1,
+            user=self.user
+        )
+    todo2 = Todo.objects.create(
+            title='Personal Task 1',
+            group=group2,
+            user=self.user
+        )
+    todo3 = Todo.objects.create(
+            title='Work Task 2',
+            group=group1,
+            user=self.user
+        )
+    
+    work_todos = Todo.objects.filter(group=group1, user=self.user)
+    personal_todos = Todo.objects.filter(group=group2, user=self.user)
+    
+    self.assertIn(todo1, work_todos)
+    self.assertIn(todo3, work_todos)
+    self.assertNotIn(todo2, work_todos)
+    self.assertIn(todo2, personal_todos)
+    self.assertNotIn(todo1, personal_todos)
+    self.assertNotIn(todo3, personal_todos)
+    self.assertEqual(work_todos.count(), 2)
+    self.assertEqual(personal_todos.count(), 1)
+
+  # @skip("Skipping get ungrouped todos test temporarily")
+  def test_get_ungrouped_todos(self):
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.create(name='Work', user=self.user)
+    
+    todo1 = Todo.objects.create(
+            title='Grouped Task',
+            group=group,
+            user=self.user
+        )
+    todo2 = Todo.objects.create(
+            title='Ungrouped Task 1',
+            user=self.user
+        )
+    todo3 = Todo.objects.create(
+            title='Ungrouped Task 2',
+            user=self.user
+        )
+    
+    ungrouped_todos = Todo.objects.filter(group__isnull=True, user=self.user)
+    
+    self.assertIn(todo2, ungrouped_todos)
+    self.assertIn(todo3, ungrouped_todos)
+    self.assertNotIn(todo1, ungrouped_todos)
+    self.assertEqual(ungrouped_todos.count(), 2)
+
+class TaskGroupViewTests(LoggedInTestCase):
+  def setUp(self):
+      super().setUp()
+      from todos.models import TaskGroup
+      self.group = TaskGroup.objects.create(
+          name='Work',
+          description='Work tasks',
+          user=self.user
+      )
+  # @skip("Skipping TaskGroup detail page test temporarily")
+  def test_groups_list_page_exists(self):
+    url = reverse('todos:groups_list')
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, 200)
+    # self.assertTemplateUsed(response, 'todos/groups_list.html')
+
+  # @skip("Skipping TaskGroup detail page template test temporarily")
+  def test_groups_list_uses_correct_template(self):
+    url = reverse('todos:groups_list')
+    response = self.client.get(url)
+    self.assertTemplateUsed(response, 'todos/groups_list.html')
+
+  # @skip("Skipping TaskGroup detail page content test temporarily")
+  def test_groups_list_shows_only_user_groups(self):
+    from todos.models import TaskGroup
+    other_user = User.objects.create_user(username='otheruser', password='password')
+    other_group = TaskGroup.objects.create(name='Personal', user=other_user)
+
+    url = reverse('todos:groups_list')
+    response = self.client.get(url)
+
+    self.assertContains(response, self.group.name)
+    self.assertNotContains(response, other_group.name)
+
+  # @skip("Skipping TaskGroup detail page authentication test temporarily")
+  def test_groups_list_requires_authentication(self):
+    """Test that groups list requires authentication"""
+    self.client.logout()
+    url = reverse('todos:groups_list')
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, 302)
+
+  # @skip("Skipping TaskGroup create page test temporarily")
+  def test_create_group_page_exists(self):
+    url = reverse('todos:create_group')
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, 200)
+
+  # @skip("Skipping TaskGroup create page template test temporarily")
+  def test_create_group_page_uses_correct_template(self):
+    url = reverse('todos:create_group')
+    response = self.client.get(url)
+    self.assertTemplateUsed(response, 'todos/create_group.html')
+
+  # @skip("Skipping TaskGroup create with valid data test temporarily")
+  def test_create_group_with_valid_data(self):
+    url = reverse('todos:create_group')
+    valid_data = {
+      'name': 'Personal',
+      'description': 'Personal tasks',
+      'color': '#FF5733',
+    }
+    response = self.client.post(url, valid_data)
+    self.assertEqual(response.status_code, 302)
+
+    from todos.models import TaskGroup
+    group = TaskGroup.objects.filter(name='Personal', user=self.user)
+    self.assertTrue(group.exists())
+  
+  # @skip("Skipping TaskGroup create with invalid data test temporarily")
+  def test_create_group_with_invalid_data(self):
+    url = reverse('todos:create_group')
+    invalid_data = {
+      'name': '',
+      'description': 'Personal tasks',
+      'color': '#FF5733',
+    }
+    response = self.client.post(url, invalid_data)
+    self.assertEqual(response.status_code, 200)
+    self.assertContains(response, 'This field is required')
+
+  # @skip("Skipping TaskGroup create with duplicate name test temporarily")
+  def test_create_group_with_duplicate_name_for_same_user(self):
+    url = reverse('todos:create_group')
+    duplicate_data = {
+      'name': 'Work',
+      'description': 'Duplicate group name',
+      'color': '#33FF57',
+    }
+    response = self.client.post(url, duplicate_data)
+    self.assertEqual(response.status_code, 200)
+    self.assertContains(response, 'You already have a group named')
+
+  # @skip("Skipping TaskGroup detail page test temporarily")
+  def test_group_detail_page_exists(self):
+    url = reverse('todos:group_detail', args=[self.group.id])
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, 200)
+
+  # @skip("Skipping TaskGroup detail page template test temporarily")
+  def test_group_detail_shows_todos_in_group(self):
+    """Test that group detail shows todos belonging to group"""
+    todo1 = Todo.objects.create(title='Task 1', user=self.user, group=self.group)
+    todo2 = Todo.objects.create(title='Task 2', user=self.user, group=self.group)
+    todo3 = Todo.objects.create(title='Task 3', user=self.user)  # No group
+    
+    url = reverse('todos:group_detail', args=[self.group.id])
+    response = self.client.get(url)
+    
+    self.assertContains(response, todo1.title)
+    self.assertContains(response, todo2.title)
+    self.assertNotContains(response, todo3.title)
+
+  # @skip("Skipping TaskGroup detail page access control test temporarily")
+  def test_user_cannot_view_other_user_group(self):
+    other_user = User.objects.create_user(username='otheruser', password='password')
+    from todos.models import TaskGroup
+    other_group = TaskGroup.objects.create(name='Personal', user=other_user)
+
+    url = reverse('todos:group_detail', args=[other_group.id])
+    response = self.client.get(url)
+
+    self.assertEqual(response.status_code, 404)
+
+  # @skip("Skipping TaskGroup update page test temporarily")
+  def test_update_group_page_exists(self):
+    url = reverse('todos:update_group', args=[self.group.id])
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, 200)
+
+  # @skip("Skipping TaskGroup update page template test temporarily")
+  def test_update_group_with_valid_data(self):
+    url = reverse('todos:update_group', args=[self.group.id])
+    valid_data = {
+      'name': 'Updated Work',
+      'description': 'Updated description',
+      'color': '#3357FF',
+    }
+    response = self.client.post(url, valid_data)
+    self.assertEqual(response.status_code, 302)
+
+    self.group.refresh_from_db()
+    self.assertEqual(self.group.name, 'Updated Work')
+    self.assertEqual(self.group.description, 'Updated description')
+  
+  # @skip("Skipping TaskGroup update with invalid data test temporarily")
+  def test_user_cannot_update_other_user_group(self):
+    other_user = User.objects.create_user(username='otheruser', password='password')
+    from todos.models import TaskGroup
+    other_group = TaskGroup.objects.create(name='Personal', user=other_user)
+
+    url = reverse('todos:update_group', args=[other_group.id])
+    valid_data = {
+      'name': 'Hacked Name',
+      'description': 'Hacked description',
+      'color': '#000000',
+    }
+    response = self.client.post(url, valid_data)
+    self.assertEqual(response.status_code, 404)
+
+  # @skip("Skipping TaskGroup delete page test temporarily")
+  def test_delete_group_page_exists(self):
+    url = reverse('todos:delete_group', args=[self.group.id])
+    response = self.client.get(url)
+    self.assertEqual(response.status_code, 200)
+
+  # @skip("Skipping TaskGroup delete group test temporarily")
+  def test_delete_group_removes_group(self):
+    url = reverse('todos:delete_group', args=[self.group.id])
+    response = self.client.post(url, {'confirm': 'yes'})
+    self.assertEqual(response.status_code, 302)
+
+    from todos.models import TaskGroup
+    group_exists = TaskGroup.objects.filter(id=self.group.id).exists()
+    self.assertFalse(group_exists)
+
+  # @skip("Skipping TaskGroup delete todos handling test temporarily")
+  def test_delete_group_does_not_delete_todos(self):
+    """Test that deleting group doesn't delete todos"""
+    todo = Todo.objects.create(title='Task', user=self.user, group=self.group)
+    
+    url = reverse('todos:delete_group', args=[self.group.id])
+    self.client.post(url, {'confirm': 'yes'})
+    
+    todo.refresh_from_db()
+    self.assertIsNone(todo.group)
+    self.assertTrue(Todo.objects.filter(id=todo.id).exists())
+  
+  # @skip("Skipping TaskGroup delete other user group test temporarily")
+  def test_user_cannot_delete_other_user_group(self):
+    """Test that user cannot delete another user's group"""
+    other_user = User.objects.create_user(username='other', password='password')
+    from todos.models import TaskGroup
+    other_group = TaskGroup.objects.create(name='Other', user=other_user)
+    
+    url = reverse('todos:delete_group', args=[other_group.id])
+    response = self.client.post(url, {'confirm': 'yes'})
+    
+    self.assertEqual(response.status_code, 404)
+    self.assertTrue(TaskGroup.objects.filter(id=other_group.id).exists())
+
+class TodoGroupFilterTests(LoggedInTestCase):
+  def setUp(self):
+    super().setUp()
+    from todos.models import TaskGroup
+    self.work_group = TaskGroup.objects.create(name='Work', user=self.user)
+    self.personal_group = TaskGroup.objects.create(name='Personal', user=self.user)
+    
+    self.work_todo = Todo.objects.create(title='Work Task', user=self.user, group=self.work_group)
+    self.personal_todo = Todo.objects.create(title='Personal Task', user=self.user, group=self.personal_group)
+    self.no_group_todo = Todo.objects.create(title='No Group', user=self.user)
+
+  def test_index_page_can_filter_by_group(self):
+    """Test that index page can filter todos by group"""
+    url = reverse('todos:index') + f'?group={self.work_group.id}'
+    response = self.client.get(url)
+    
+    self.assertContains(response, self.work_todo.title)
+    self.assertNotContains(response, self.personal_todo.title)
+
+  def test_index_page_can_show_ungrouped_todos(self):
+    """Test that index page can show only ungrouped todos"""
+    url = reverse('todos:index') + '?group=none'
+    response = self.client.get(url)
+    
+    self.assertContains(response, self.no_group_todo.title)
+    self.assertNotContains(response, self.work_todo.title)

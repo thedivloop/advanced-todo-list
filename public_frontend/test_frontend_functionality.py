@@ -125,7 +125,7 @@ class LoginPageTest(TestCase):
     self.driver.find_element(By.NAME, "username").send_keys(new_user_with_invalid_username["username"])
     self.driver.find_element(By.NAME, "password").send_keys(new_user_with_invalid_username["password1"])
     self.driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
-    WebDriverWait(self.driver, 4)
+    WebDriverWait(self.driver, 9)
     # Assert that after login, the user is redirected to the home page
     self.assertEqual(self.driver.current_url, pages_url["login"])
 

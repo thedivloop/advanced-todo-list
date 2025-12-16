@@ -1,11 +1,11 @@
 from django import forms
-from .models import Todo
+from .models import Todo, TaskGroup
 
 class NewTodoForm(forms.ModelForm):
   class Meta:
     model = Todo
     # exclude = ['user']
-    fields = ('title', 'description', 'priority', 'status', 'due_date', 'duration', 'time_completion', 'time_spent', 'time_remaining')
+    fields = ('title', 'description', 'priority', 'status', 'due_date', 'duration', 'group', 'time_completion', 'time_spent', 'time_remaining')
     widgets = {
       'due_date': forms.DateInput(attrs={'type': 'date'}),
     }
@@ -54,11 +54,17 @@ class NewTodoForm(forms.ModelForm):
         'invalid': "Enter a valid time remaining.",
       },
     }
+  def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user', None)
+    super().__init__(*args, **kwargs)
+    if user:
+      self.fields['group'].queryset = TaskGroup.objects.filter(user=user)
+      self.fields['group'].required = False
 
 class UpdateTodoForm(forms.ModelForm):
   class Meta:
     model = Todo
-    fields = ('title', 'description', 'priority', 'status', 'due_date', 'duration', 'time_completion', 'time_spent', 'time_remaining')
+    fields = ('title', 'description', 'priority', 'status', 'due_date', 'duration', 'group', 'time_completion', 'time_spent', 'time_remaining')
     widgets = {
       'due_date': forms.DateInput(attrs={'type': 'date'}),
     }
@@ -108,3 +114,42 @@ class UpdateTodoForm(forms.ModelForm):
         'invalid': "Enter a valid time remaining.",
       },
     }
+  def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user', None)
+    super().__init__(*args, **kwargs)
+    if user:
+      self.fields['group'].queryset = TaskGroup.objects.filter(user=user)
+      self.fields['group'].required = False
+
+class TaskGroupForm(forms.ModelForm):
+  class Meta:
+    model = TaskGroup
+    fields = ('name', 'description', 'color')
+    widgets = {
+        'color': forms.TextInput(attrs={'type': 'color'}),
+        'description': forms.Textarea(attrs={'rows': 3}),
+    }
+    labels = {
+        'name': 'Group Name',
+        'description': 'Description (Optional)',
+        'color': 'Color',
+    }
+    help_texts = {
+        'name': 'Enter a unique name for this group.',
+        'color': 'Choose a color to identify this group.',
+    }
+  
+  def __init__(self, *args, **kwargs):
+    self.user = kwargs.pop('user', None)
+    super().__init__(*args, **kwargs)
+  
+  def clean_name(self):
+    name = self.cleaned_data.get('name')
+    if self.user:
+      # Check for duplicate group name for this user
+      existing = TaskGroup.objects.filter(user=self.user, name=name)
+      if self.instance.pk:
+        existing = existing.exclude(pk=self.instance.pk)
+      if existing.exists():
+        raise forms.ValidationError(f'You already have a group named "{name}".')
+    return name
