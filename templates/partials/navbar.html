@@ -1,11 +1,16 @@
 <aside style="display: flex; width: 10rem; position:fixed; height:screen;">
   <div>
-    📝 ToDo App
+    📝 ATLAS
   </div>
   <nav >
-    <a href="#">
-      TODOS
+    <a href="{% url 'todos:index' %}" >
+      📋 Todos
     </a>
+    <a href="{% url 'todos:groups_list' %}" >
+      📁 Groups
+    </a>
+    <hr>
+    
     <!-- <a href="#" class="block px-3 py-2 rounded hover:bg-gray-700">
       My Tasks
     </a>

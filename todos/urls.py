@@ -15,4 +15,11 @@ urlpatterns = [
   path('<int:pk>/timer/stop/', views.stop_timer, name='stop_timer'),
   path('<int:pk>/timer/status/', views.get_timer_status, name='timer_status'),
   path('timer/check-active/', views.check_active_timer, name='check_active_timer'),
+
+  # Group endpoints
+  path('groups/', views.groups_list, name='groups_list'),
+  path('groups/new/', views.create_group, name='create_group'),
+  path('groups/<int:pk>/', views.group_detail, name='group_detail'),
+  path('groups/<int:pk>/update/', views.update_group, name='update_group'),
+  path('groups/<int:pk>/delete/', views.delete_group, name='delete_group'),
 ]

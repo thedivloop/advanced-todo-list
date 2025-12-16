@@ -8,8 +8,8 @@
 {% endblock %}
 
 {% block content %}
+{% include "partials/navbar.html" %}
 <div class="todos-page">
-  <!-- { include "partials/navbar.html" } -->
 
   <div class="todos-content">
     <!-- Header with Stats -->
@@ -36,6 +36,19 @@
       <div class="search-box">
         <input type="text" id="search-input" placeholder="Search todos...">
       </div>
+
+      <!-- GROUP FILTER - ADD THIS -->
+      <label for="filter-group">Group:</label>
+      <select id="filter-group" onchange="filterByGroup(this.value)">
+        <option value="all" {% if not selected_group %}selected{% endif %}>All Groups</option>
+        <option value="none" {% if selected_group == 'none' %}selected{% endif %}>No Group</option>
+        {% for group in groups %}
+        <option value="{{ group.id }}" {% if selected_group == group.id|stringformat:"s" %}selected{% endif %}>
+          {{ group.name }}
+        </option>
+        {% endfor %}
+      </select>
+
       <label for="filter-status">Status:</label>
       <select id="filter-status">
         <option value="all">All</option>
@@ -125,6 +138,13 @@
 
 <script>
   // Search functionality
+  function filterByGroup(groupId) {
+    if (groupId === 'all') {
+      window.location.href = '{% url "todos:index" %}';
+    } else {
+      window.location.href = '{% url "todos:index" %}?group=' + groupId;
+    }
+  }
   const searchInput = document.getElementById('search-input');
   const filterStatus = document.getElementById('filter-status');
   const sortBy = document.getElementById('sort-by');

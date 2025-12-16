@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update {{ group.name }} - ATLAS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'todos/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include "partials/navbar.html" %}
+<div style="min-height: calc(100vh - 80px); display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 2rem;">
+  <div class="modal-box" style="max-width: 600px;">
+    <h1>✏️ Update Group</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <a href="{% url 'todos:groups_list' %}" style="flex: 1; padding: 0.8rem; background: #e9ecef; color: #495057; text-decoration: none; text-align: center; border-radius: 6px; font-weight: bold;">
+          Cancel
+        </a>
+        <button type="submit" style="flex: 1; padding: 0.8rem; background: #3CD4B3; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

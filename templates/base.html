@@ -20,6 +20,7 @@
                     <li><a href="{% url 'public_frontend:about' %}">About</a></li>
                     {% if user.is_authenticated %}
                     <li><a href="{% url 'todos:index' %}">My Todos</a></li>
+                    
                     {% endif %}
                 </ul>
                 
