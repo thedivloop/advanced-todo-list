@@ -1043,3 +1043,194 @@ class TodoGroupFilterTests(LoggedInTestCase):
     
     self.assertContains(response, self.no_group_todo.title)
     self.assertNotContains(response, self.work_todo.title)
+
+class TodoFormTests(LoggedInTestCase):
+  def setUp(self):
+    super().setUp()
+    from todos.models import TaskGroup
+    self.group1 = TaskGroup.objects.create(name='Work', user=self.user)
+    self.group2 = TaskGroup.objects.create(name='Personal', user=self.user)
+    
+    # Create another user and their group
+    self.other_user = User.objects.create_user(username='other', password='password')
+    self.other_group = TaskGroup.objects.create(name='Other Work', user=self.other_user)
+  
+  def test_new_todo_form_filters_groups_by_user(self):
+    """Test that NewTodoForm only shows groups belonging to the user"""
+    from todos.forms import NewTodoForm
+    
+    form = NewTodoForm(user=self.user)
+    
+    # Check that group field queryset is filtered
+    group_choices = list(form.fields['group'].queryset)
+    
+    self.assertIn(self.group1, group_choices)
+    self.assertIn(self.group2, group_choices)
+    self.assertNotIn(self.other_group, group_choices)
+    self.assertEqual(len(group_choices), 2)
+  
+  def test_new_todo_form_group_is_not_required(self):
+    """Test that group field is not required in NewTodoForm"""
+    from todos.forms import NewTodoForm
+    
+    form = NewTodoForm(user=self.user)
+    
+    self.assertFalse(form.fields['group'].required)
+  
+  def test_new_todo_form_without_user_has_all_groups(self):
+    """Test that NewTodoForm without user parameter shows all groups"""
+    from todos.forms import NewTodoForm
+    
+    form = NewTodoForm()  # No user parameter
+    
+    # Should show all groups when no user filtering
+    group_choices = list(form.fields['group'].queryset)
+    
+    self.assertIn(self.group1, group_choices)
+    self.assertIn(self.group2, group_choices)
+    self.assertIn(self.other_group, group_choices)
+    self.assertEqual(len(group_choices), 3)
+
+  def test_update_todo_form_filters_groups_by_user(self):
+    """Test that UpdateTodoForm only shows groups belonging to the user"""
+    from todos.forms import UpdateTodoForm
+    
+    todo = Todo.objects.create(
+        title='Test Task',
+        user=self.user,
+        group=self.group1
+    )
+    
+    form = UpdateTodoForm(instance=todo, user=self.user)
+    
+    # Check that group field queryset is filtered
+    group_choices = list(form.fields['group'].queryset)
+    
+    self.assertIn(self.group1, group_choices)
+    self.assertIn(self.group2, group_choices)
+    self.assertNotIn(self.other_group, group_choices)
+    self.assertEqual(len(group_choices), 2)
+  
+  def test_update_todo_form_group_is_not_required(self):
+    """Test that group field is not required in UpdateTodoForm"""
+    from todos.forms import UpdateTodoForm
+    
+    todo = Todo.objects.create(
+        title='Test Task',
+        user=self.user
+    )
+    
+    form = UpdateTodoForm(instance=todo, user=self.user)
+    
+    self.assertFalse(form.fields['group'].required)
+  
+  def test_update_todo_form_without_user_has_all_groups(self):
+    """Test that UpdateTodoForm without user parameter shows all groups"""
+    from todos.forms import UpdateTodoForm
+    
+    todo = Todo.objects.create(
+        title='Test Task',
+        user=self.user
+    )
+    
+    form = UpdateTodoForm(instance=todo)  # No user parameter
+    
+    # Should show all groups when no user filtering
+    group_choices = list(form.fields['group'].queryset)
+    
+    self.assertIn(self.group1, group_choices)
+    self.assertIn(self.group2, group_choices)
+    self.assertIn(self.other_group, group_choices)
+    self.assertEqual(len(group_choices), 3)
+  
+  def test_new_todo_form_submission_with_group(self):
+    """Test submitting NewTodoForm with a group selected"""
+    from todos.forms import NewTodoForm
+    
+    form_data = {
+        'title': 'Test Task',
+        'description': 'Test description',
+        'priority': 'High',
+        'status': 'Pending',
+        'group': self.group1.id
+    }
+    
+    form = NewTodoForm(data=form_data, user=self.user)
+    
+    self.assertTrue(form.is_valid())
+    todo = form.save(commit=False)
+    todo.user = self.user
+    todo.save()
+    
+    self.assertEqual(todo.group, self.group1)
+  
+  def test_new_todo_form_submission_without_group(self):
+    """Test submitting NewTodoForm without a group (should be valid)"""
+    from todos.forms import NewTodoForm
+    
+    form_data = {
+        'title': 'Test Task',
+        'description': 'Test description',
+        'priority': 'High',
+        'status': 'Pending',
+        # No group specified
+    }
+    
+    form = NewTodoForm(data=form_data, user=self.user)
+    
+    self.assertTrue(form.is_valid())
+    todo = form.save(commit=False)
+    todo.user = self.user
+    todo.save()
+    
+    self.assertIsNone(todo.group)
+  
+  def test_update_todo_form_can_change_group(self):
+    """Test that UpdateTodoForm can change a todo's group"""
+    from todos.forms import UpdateTodoForm
+    
+    todo = Todo.objects.create(
+        title='Test Task',
+        user=self.user,
+        group=self.group1
+    )
+    
+    form_data = {
+        'title': 'Updated Task',
+        'description': 'Updated description',
+        'priority': 'Medium',
+        'status': 'In Progress',
+        'group': self.group2.id
+    }
+    
+    form = UpdateTodoForm(data=form_data, instance=todo, user=self.user)
+    
+    self.assertTrue(form.is_valid())
+    updated_todo = form.save()
+    
+    self.assertEqual(updated_todo.group, self.group2)
+
+  def test_update_todo_form_can_remove_group(self):
+    """Test that UpdateTodoForm can remove a todo's group"""
+    from todos.forms import UpdateTodoForm
+    
+    todo = Todo.objects.create(
+        title='Test Task',
+        user=self.user,
+        group=self.group1
+    )
+    
+    form_data = {
+        'title': 'Updated Task',
+        'description': 'Updated description',
+        'priority': 'Medium',
+        'status': 'In Progress',
+        # No group specified - should set to None
+    }
+    
+    form = UpdateTodoForm(data=form_data, instance=todo, user=self.user)
+    
+    self.assertTrue(form.is_valid())
+    updated_todo = form.save()
+    
+    self.assertIsNone(updated_todo.group)
