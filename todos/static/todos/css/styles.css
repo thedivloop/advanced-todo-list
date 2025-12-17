@@ -746,11 +746,9 @@ aside nav hr {
   color: #4CAF50;
 }
 
+
 .due-date {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85em;
+  font-size: 1em;
   color: #6c757d;
   font-weight: 500;
 }
@@ -760,9 +758,9 @@ aside nav hr {
   font-weight: 600;
 }
 
-.due-date::before {
+/* .due-date::before {
   content: '📅';
-}
+} */
 
 /* Quick Actions (appears on hover) */
 .quick-actions {
