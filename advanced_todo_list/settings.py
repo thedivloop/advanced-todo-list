@@ -1,20 +1,32 @@
 from pathlib import Path
 import os
 
+import json
+from django.core.exceptions import ImproperlyConfigured
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+KEYSDIR = str(BASE_DIR)+"/keys.json"
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+with open(KEYSDIR) as k:
+  project_keys: dict = json.loads(k.read())
+
+def get_key(setting,project_keys=project_keys) -> str:
+  try:
+    return project_keys[setting]
+  except KeyError:
+    error_message: str = "Set the {} env var".format(setting)
+    raise ImproperlyConfigured(error_message)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qds-9^cdaqx0ywku42h&_v_n9sor=w4!z+s-d*wuif&12brx-b'
+SECRET_KEY = get_key("SECRETKEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = get_key("ENVIRONMENT") == "development" and get_key("ENVIRONMENT") != "production"
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*','thedivloop.pythonanywhere.com']
 
 
 # Application definition
@@ -108,6 +120,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = '/home/thedivloop/advanced-todo-list/todos/static'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),

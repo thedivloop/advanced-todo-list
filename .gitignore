@@ -71,5 +71,7 @@ celerybeat-schedule*
 # Docker
 docker-compose.override.yml
 
-# Local configuration
+# Local configuration and files
 local_settings.py
+local.md
+keys.json
