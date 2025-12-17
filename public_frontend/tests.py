@@ -42,7 +42,7 @@ class AboutPageTest(TestCase):
 
   def test_about_page_has_correct_title(self):
     response = self.client.get('/about/')
-    self.assertContains(response, '<title>Atlas About</title>')
+    self.assertContains(response, '<title>About Atlas</title>')
   
   def test_about_page_has_correct_menu(self):
     response = self.client.get('/about/')

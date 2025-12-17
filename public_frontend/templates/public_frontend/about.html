@@ -1,6 +1,255 @@
-{% extends 'base.html' %} 
-{% block title %}Atlas About{% endblock %} 
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Atlas{% endblock %}
+
 {% block content %}
-<h1>About</h1>
-<p>This is the content of the child template.</p>
+<style>
+  /* About Hero */
+  .about-hero {
+    background: linear-gradient(135deg, #3CD4B3 0%, #29a17a 100%);
+    color: white;
+    padding: 5rem 2rem;
+    text-align: center;
+  }
+
+  .about-hero h1 {
+    font-size: 3.2em;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+
+  .about-hero p {
+    font-size: 1.3em;
+    max-width: 800px;
+    margin: 0 auto;
+    opacity: 0.95;
+  }
+
+  /* Section base */
+  .about-section {
+    padding: 5rem 2rem;
+    background: #f4f4f4;
+  }
+
+  .about-section.white {
+    background: white;
+  }
+
+  .about-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .about-title {
+    text-align: center;
+    font-size: 2.5em;
+    color: #2c3e50;
+    margin-bottom: 3rem;
+  }
+
+  /* Cards */
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .about-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .about-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.15);
+  }
+
+  .about-card h3 {
+    font-size: 1.4em;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+
+  .about-card p {
+    color: #6c757d;
+    line-height: 1.7;
+  }
+
+  .about-icon {
+    font-size: 3em;
+    margin-bottom: 1rem;
+  }
+
+  /* Tech list */
+  .tech-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .tech-item {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  /* CTA */
+  .about-cta {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5rem 2rem;
+    text-align: center;
+  }
+
+  .about-cta h2 {
+    font-size: 2.5em;
+    margin-bottom: 1.5rem;
+  }
+
+  .about-cta p {
+    font-size: 1.2em;
+    max-width: 650px;
+    margin: 0 auto 2.5rem;
+    opacity: 0.95;
+  }
+  /* CTA Button – match homepage hero style */
+.about-cta .hero-btn {
+  padding: 1rem 2.5rem;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Override global btn-primary */
+.about-cta .btn-primary {
+  background: white;
+  color: #667eea !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.about-cta .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+</style>
+
+<!-- Hero -->
+<section class="about-hero">
+  <h1>About ATLAS</h1>
+  <p>
+    ATLAS is built to help people manage tasks realistically — with time,
+    focus, and structure at the center of productivity.
+  </p>
+</section>
+
+<!-- Vision -->
+<section class="about-section white">
+  <div class="about-container">
+    <h2 class="about-title">Our Vision</h2>
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-icon">🧠</div>
+        <h3>Productivity with Awareness</h3>
+        <p>
+          ATLAS was created to move beyond simple task lists.
+          Time awareness, effort estimation, and progress tracking are
+          first-class concepts — not afterthoughts.
+        </p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-icon">⏳</div>
+        <h3>Time Is the Real Currency</h3>
+        <p>
+          Tasks take time. ATLAS embraces that reality by combining task
+          management with built-in timers and duration tracking.
+        </p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-icon">🎯</div>
+        <h3>Clarity Over Chaos</h3>
+        <p>
+          Clear priorities, structured groups, and visual feedback
+          help users focus on what truly matters — every day.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="about-section">
+  <div class="about-container">
+    <h2 class="about-title">How ATLAS Works</h2>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>Plan</h3>
+        <p>
+          Create tasks with priorities, due dates, and estimated durations.
+          Organize them into meaningful groups that reflect real workflows.
+        </p>
+      </div>
+      <div class="about-card">
+        <h3>Execute</h3>
+        <p>
+          Start timers when you work. Pause when life interrupts.
+          ATLAS tracks real effort — not guesses.
+        </p>
+      </div>
+      <div class="about-card">
+        <h3>Review</h3>
+        <p>
+          See what you completed, how long it actually took,
+          and where your time really went.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technology -->
+<section class="about-section white">
+  <div class="about-container">
+    <h2 class="about-title">Built With Care</h2>
+    <p class="text-center" style="max-width:700px; margin:0 auto; color:#6c757d;">
+      ATLAS was developed as a CS50 Final Project with a strong focus on
+      software engineering principles and clean architecture.
+    </p>
+
+    <div class="tech-list">
+      <div class="tech-item">🐍 Django (Backend)</div>
+      <div class="tech-item">⚛️ React (Frontend)</div>
+      <div class="tech-item">🧪 Test-Driven Development</div>
+      <div class="tech-item">🗄️ SQLite (Development)</div>
+      <div class="tech-item">🔐 Authentication & Authorization</div>
+      <div class="tech-item">📐 Scalable Design</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="about-cta">
+  <h2>Start Managing Time Smarter</h2>
+  <p>
+    Whether you're a student, professional, or creator,
+    ATLAS helps you turn plans into progress.
+  </p>
+  <a href="{% url 'users:register' %}" class="hero-btn btn-primary">
+    Create Your Free Account →
+  </a>
+</section>
 {% endblock %}
