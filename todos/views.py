@@ -47,7 +47,7 @@ def new(request):
       todo.save()
       return redirect("todos:index")
   else:
-    form = NewTodoForm()
+    form = NewTodoForm(user=request.user)
   return render(request, 'todos/new.html', {'form' : form})
 
 @login_required
@@ -64,7 +64,7 @@ def update(request,pk):
       todo.save()
       return redirect("todos:index")
   else:
-    form = UpdateTodoForm(instance=todo)
+    form = UpdateTodoForm(instance=todo, user=request.user)
   return render(request, 'todos/update.html', { 'form' : form })
 
 @login_required
