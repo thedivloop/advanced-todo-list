@@ -9,6 +9,7 @@ __pycache__/
 *.py[cod]
 
 # Django
+/advanced_todo_list/settings.py
 *.log
 *.pot
 *.mo
