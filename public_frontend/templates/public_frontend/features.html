@@ -146,6 +146,51 @@
     color: #F5A623;
   }
 
+  /* CTA */
+  .features-cta {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 5rem 2rem;
+    text-align: center;
+  }
+
+  .features-cta h2 {
+    font-size: 2.5em;
+    margin-bottom: 1.5rem;
+  }
+
+  .features-cta p {
+    font-size: 1.2em;
+    max-width: 650px;
+    margin: 0 auto 2.5rem;
+    opacity: 0.95;
+  }
+
+  /* CTA Button – match homepage hero style */
+.features-cta .hero-btn {
+  padding: 1rem 2.5rem;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Override global btn-primary */
+.features-cta .btn-primary {
+  background: white;
+  color: #667eea !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.features-cta .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+
   @media (max-width: 968px) {
     .feature-section {
       grid-template-columns: 1fr;
@@ -398,4 +443,15 @@
 </div>
 
 <!-- CTA -->
+ <!-- CTA -->
+<section class="features-cta">
+  <h2>Start Managing Time Smarter</h2>
+  <p>
+    Whether you're a student, professional, or creator,
+    ATLAS helps you turn plans into progress.
+  </p>
+  <a href="{% url 'users:register' %}" class="hero-btn btn-primary">
+    Create Your Free Account →
+  </a>
+</section>
 {% endblock %}
