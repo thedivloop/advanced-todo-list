@@ -1,6 +1,8 @@
-# CS50 Final project : Advanced todo list application system (ATLAS)
+# CS50 Final project : Advanced task list application system (ATLAS)
 
-## Overview
+#### Video Demo:  <URL HERE>
+
+## Description
 
 ### Background
 
@@ -33,13 +35,14 @@ In addition, there are additional features, namely:
 
 To maintain for now some simplicity the stack will be:
 
-| Service  |   Framework   | Language   |
-| :------- | :-----------: | :--------- |
-| Backend  |    Django     | Python     |
-| Frontend |    ReactJS    | Javascript |
-| Database |    SQLite3    | SQL        |
-| Hosting  | Digital Ocean |
+| Service  |    Framework   | Language   |
+| :------- | :------------: | :--------- |
+| Backend  |    Django      | Python     |
+| Frontend |    ReactJS*    | Javascript |
+| Database |    SQLite3     | SQL        |
+| Hosting  | Digital Ocean* |
 
+*to be added
 ## Other systems and utilities
 
 Other systems will include:
@@ -48,10 +51,11 @@ Other systems will include:
 | Source code versioning | Github |
 | CI/CD | Github Actions |
 | BE Testing | unittest|
-| FE testing | Jest |  
+| FE testing | Jest* |  
 | IDE | VS Code
 | UI design | Figma
 
+*to be added
 ## Techniques
 
 Before coding anything, requirements have to be defined, and translated into user stories.
@@ -161,9 +165,9 @@ jobs:
 
 ### Key Benefits of TDD
 
-✅ Fewer bugs in production
-✅ More modular and maintainable code
-✅ Confidence in refactoring without breaking functionality
+✅ Fewer bugs in production  
+✅ More modular and maintainable code  
+✅ Confidence in refactoring without breaking functionality  
 ✅ Easier collaboration with well-defined test cases
 
 ## Detailed process
@@ -228,7 +232,7 @@ Think about who would benefit most from your app. Some potential user groups:
 
 #### Create User Personas
 
-User personas help you understand your users' needs and behaviors.
+User personas help understand users' needs and behaviors.
 
 👤 Persona 1: Sarah (Project Manager)
 
@@ -539,3 +543,13 @@ User personas help you understand your users' needs and behaviors.
 ## Resources
 
 Django Test Driven Development [video](https://www.youtube.com/watch?v=REhBTwubGzo&t=187s)
+
+## Credits
+[django](https://www.djangoproject.com/)  
+Main framework for the development of this project.  
+[github](https://github.com/)  
+Hosting of the code. Github copilot was also used on VS Code when needed to accelerate the writing, particularly for test functions.  
+[claude.ai](https://claude.ai)  
+Used for formulation of some tests during TDD process and debugging of some implementation errors. In addition, it was used to support the writing of the public pages.  
+[chatgpt.com](https://chatgpt.com)  
+Used for README.md file initial writing and review as well as for deployment errors troubleshouting.
