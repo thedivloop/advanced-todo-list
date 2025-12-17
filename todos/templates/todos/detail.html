@@ -521,9 +521,17 @@ stopBtn.addEventListener('click', async () => {
     if (response.ok) {
       clearInterval(timerInterval);
       const data = await response.json();
-      
-      document.getElementById('time-spent').textContent = `${data.time_spent || 0} min`;
-      document.getElementById('time-remaining').textContent = `${data.time_remaining || 0} min`;
+
+      const timeSpentElement = document.getElementById('time-spent');
+      const timeRemainingElement = document.getElementById('time-remaining');
+
+      if (timeSpentElement) {
+        timeSpentElement.textContent = `${data.time_spent || 0} min`;
+      }
+
+      if (timeRemainingElement) {
+        timeRemainingElement.textContent = `${data.time_remaining || 0} min`;
+      }
       
       elapsedSeconds = 0;
       timerDisplay.textContent = '00:00:00';
@@ -532,6 +540,10 @@ stopBtn.addEventListener('click', async () => {
       
       // Reload to show updated status
       setTimeout(() => location.reload(), 1000);
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Stop timer failed:', errorData);
+      alert('Failed to stop timer. Please try again.');
     }
   } catch (error) {
     console.error('Error stopping timer:', error);
