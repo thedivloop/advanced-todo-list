@@ -1,6 +1,401 @@
 {% extends 'base.html' %} 
-{% block title %}Atlas Features{% endblock %} 
+
+{% load static %}
+
+{% block title %}Atlas Features{% endblock %}
+
 {% block content %}
-<h1>Features</h1>
-<p>This is the content of the child template.</p>
+<style>
+  .features-hero {
+    background: linear-gradient(135deg, #3CD4B3 0%, #29a17a 100%);
+    color: white;
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+
+  .features-hero h1 {
+    font-size: 3em;
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+
+  .features-hero p {
+    font-size: 1.3em;
+    opacity: 0.95;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .features-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  .feature-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    margin-bottom: 6rem;
+  }
+
+  .feature-section:nth-child(even) {
+    direction: rtl;
+  }
+
+  .feature-section:nth-child(even) > * {
+    direction: ltr;
+  }
+
+  .feature-content h2 {
+    font-size: 2.5em;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+
+  .feature-content h3 {
+    font-size: 1.3em;
+    color: #3CD4B3;
+    margin-bottom: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .feature-content p {
+    color: #6c757d;
+    line-height: 1.8;
+    font-size: 1.1em;
+  }
+
+  .feature-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+  }
+
+  .feature-content li {
+    padding: 0.5rem 0;
+    color: #495057;
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .feature-content li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #3CD4B3;
+    font-weight: bold;
+    font-size: 1.3em;
+  }
+
+  .feature-visual {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 16px;
+    padding: 3rem;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .feature-icon-large {
+    font-size: 8em;
+    margin-bottom: 1rem;
+  }
+
+  .feature-demo-box {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+  }
+
+  .demo-timer {
+    font-size: 3em;
+    font-weight: bold;
+    color: #3CD4B3;
+    font-family: 'Courier New', monospace;
+    margin: 1rem 0;
+  }
+
+  .demo-card {
+    background: white;
+    border-left: 5px solid #3CD4B3;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 0.5rem 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .demo-priority {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-top: 0.5rem;
+  }
+
+  .priority-high {
+    background: #ffe5e5;
+    color: #D57373;
+  }
+
+  .priority-medium {
+    background: #fff3e0;
+    color: #F5A623;
+  }
+
+  @media (max-width: 968px) {
+    .feature-section {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .feature-section:nth-child(even) {
+      direction: ltr;
+    }
+
+    .features-hero h1 {
+      font-size: 2.5em;
+    }
+  }
+</style>
+
+<!-- Hero -->
+<section class="features-hero">
+  <h1>⚡ Powerful Features</h1>
+  <p>Everything you need to master your tasks and maximize your productivity</p>
+</section>
+
+<!-- Features Content -->
+<div class="features-content">
+  
+  <!-- Feature 1: Smart Timer -->
+  <div class="feature-section">
+    <div class="feature-content">
+      <h2>⏱️ Smart Task Timer</h2>
+      <p>
+        Track exactly how much time you spend on each task with our intelligent timer system. Perfect for freelancers, students, and professionals who need accurate time tracking.
+      </p>
+      
+      <h3>Key Benefits:</h3>
+      <ul>
+        <li>One-click start and stop</li>
+        <li>Automatic time calculation</li>
+        <li>Track time spent vs. estimated time</li>
+        <li>Only one active timer at a time</li>
+        <li>Timer persists across page reloads</li>
+        <li>Visual countdown display</li>
+      </ul>
+
+      <p style="margin-top: 1.5rem;">
+        <strong>Pro Tip:</strong> Set estimated durations for tasks to see real-time progress and improve your time estimation skills over time.
+      </p>
+    </div>
+
+    <div class="feature-visual">
+      <div class="feature-icon-large">⏱️</div>
+      <div class="feature-demo-box">
+        <div style="color: #6c757d; margin-bottom: 0.5rem;">Active Task Timer</div>
+        <div class="demo-timer">01:23:45</div>
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+          <div style="background: #3CD4B3; color: white; padding: 0.5rem 1.5rem; border-radius: 6px; font-weight: bold;">⏸️ Pause</div>
+          <div style="background: #D57373; color: white; padding: 0.5rem 1.5rem; border-radius: 6px; font-weight: bold;">⏹️ Stop</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 2: Task Groups -->
+  <div class="feature-section">
+    <div class="feature-content">
+      <h2>📁 Organize with Task Groups</h2>
+      <p>
+        Create custom groups to categorize your tasks. Perfect for separating work projects, personal errands, study subjects, or any other classification that fits your workflow.
+      </p>
+      
+      <h3>Group Features:</h3>
+      <ul>
+        <li>Unlimited custom groups</li>
+        <li>Color-coded for quick identification</li>
+        <li>Filter tasks by group instantly</li>
+        <li>Assign tasks to multiple groups</li>
+        <li>View all tasks in a group at once</li>
+        <li>Edit and delete groups easily</li>
+      </ul>
+
+      <p style="margin-top: 1.5rem;">
+        <strong>Example Groups:</strong> Work Projects, Personal Goals, Home Chores, Study Tasks, Side Projects, Health & Fitness
+      </p>
+    </div>
+
+    <div class="feature-visual">
+      <div class="feature-icon-large">📁</div>
+      <div class="feature-demo-box">
+        <div class="demo-card" style="border-left-color: #3CD4B3;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>💼 Work</strong>
+            <span style="color: #6c757d;">12 tasks</span>
+          </div>
+        </div>
+        <div class="demo-card" style="border-left-color: #F5A623;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>🎓 Study</strong>
+            <span style="color: #6c757d;">8 tasks</span>
+          </div>
+        </div>
+        <div class="demo-card" style="border-left-color: #D57373;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>🏠 Personal</strong>
+            <span style="color: #6c757d;">5 tasks</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 3: Priority System -->
+  <div class="feature-section">
+    <div class="feature-content">
+      <h2>🎯 Priority Management</h2>
+      <p>
+        Never lose sight of what's important. Assign priority levels to your tasks and use visual color-coding to instantly identify what needs your attention first.
+      </p>
+      
+      <h3>Priority Levels:</h3>
+      <ul>
+        <li><strong style="color: #D57373;">High Priority</strong> - Urgent and important tasks</li>
+        <li><strong style="color: #F5A623;">Medium Priority</strong> - Important but not urgent</li>
+        <li><strong style="color: #3CD4B3;">Low Priority</strong> - Nice to have, no rush</li>
+      </ul>
+
+      <h3>Smart Features:</h3>
+      <ul>
+        <li>Color-coded task cards</li>
+        <li>Filter by priority level</li>
+        <li>Sort by priority</li>
+        <li>Visual priority badges</li>
+        <li>Quick priority updates</li>
+      </ul>
+    </div>
+
+    <div class="feature-visual">
+      <div class="feature-icon-large">🎯</div>
+      <div class="feature-demo-box">
+        <div class="demo-card" style="border-left-color: #D57373;">
+          <strong>Complete project proposal</strong>
+          <span class="demo-priority priority-high">HIGH</span>
+        </div>
+        <div class="demo-card" style="border-left-color: #F5A623;">
+          <strong>Review team feedback</strong>
+          <span class="demo-priority priority-medium">MEDIUM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 4: Progress Tracking -->
+  <div class="feature-section">
+    <div class="feature-content">
+      <h2>📊 Visual Progress Tracking</h2>
+      <p>
+        Stay motivated with clear visual feedback on your progress. See at a glance how much time you've spent, what's remaining, and your completion percentage.
+      </p>
+      
+      <h3>Track Everything:</h3>
+      <ul>
+        <li>Time spent on each task</li>
+        <li>Time remaining to completion</li>
+        <li>Completion percentage</li>
+        <li>Task status (Pending, In Progress, Completed)</li>
+        <li>Due dates and deadlines</li>
+        <li>Progress bars for visual feedback</li>
+      </ul>
+
+      <p style="margin-top: 1.5rem;">
+        <strong>Analytics:</strong> Future updates will include detailed analytics and insights into your productivity patterns.
+      </p>
+    </div>
+
+    <div class="feature-visual">
+      <div class="feature-icon-large">📊</div>
+      <div class="feature-demo-box">
+        <div style="margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="color: #6c757d;">Time Spent</span>
+            <strong style="color: #3CD4B3;">45 min</strong>
+          </div>
+          <div style="height: 10px; background: #e9ecef; border-radius: 5px; overflow: hidden;">
+            <div style="width: 75%; height: 100%; background: linear-gradient(90deg, #3CD4B3, #29a17a);"></div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center;">
+          <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <div style="color: #6c757d; font-size: 0.9em;">Duration</div>
+            <div style="font-size: 1.5em; font-weight: bold; color: #3CD4B3;">60 min</div>
+          </div>
+          <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <div style="color: #6c757d; font-size: 0.9em;">Remaining</div>
+            <div style="font-size: 1.5em; font-weight: bold; color: #3CD4B3;">15 min</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 5: Security & Privacy -->
+  <div class="feature-section">
+    <div class="feature-content">
+      <h2>🔒 Security & Privacy First</h2>
+      <p>
+        Your tasks, your data, your privacy. We take security seriously with industry-standard encryption and strict privacy policies.
+      </p>
+      
+      <h3>Security Features:</h3>
+      <ul>
+        <li>Encrypted password storage</li>
+        <li>Secure authentication</li>
+        <li>Private task data</li>
+        <li>No data sharing with third parties</li>
+        <li>Regular security updates</li>
+        <li>Account protection</li>
+      </ul>
+
+      <p style="margin-top: 1.5rem;">
+        <strong>Your Data:</strong> Only you can see your tasks. We never sell or share your personal information.
+      </p>
+    </div>
+
+    <div class="feature-visual">
+      <div class="feature-icon-large">🔒</div>
+      <div class="feature-demo-box" style="text-align: left;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <div style="width: 40px; height: 40px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em;">✓</div>
+          <div>
+            <strong>Encrypted Data</strong>
+            <div style="color: #6c757d; font-size: 0.9em;">Bank-level encryption</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+          <div style="width: 40px; height: 40px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em;">✓</div>
+          <div>
+            <strong>Private by Default</strong>
+            <div style="color: #6c757d; font-size: 0.9em;">Your eyes only</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 40px; height: 40px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em;">✓</div>
+          <div>
+            <strong>Secure Sessions</strong>
+            <div style="color: #6c757d; font-size: 0.9em;">Protected access</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CTA -->
 {% endblock %}
