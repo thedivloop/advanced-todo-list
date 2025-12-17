@@ -367,3 +367,16 @@ a:hover {
 .p-2 { padding: 1rem; }
 .p-3 { padding: 1.5rem; }
 .p-4 { padding: 2rem; }
+
+/* ========================================
+  FOOTER AREA
+   ======================================== */
+
+footer {
+  text-align: center;
+  padding: 1rem 0;
+  background-color: #f4f4f4;
+  color: #738883;
+  font-size: 0.9rem;
+  border-top: 1px solid #ddd;
+}

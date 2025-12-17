@@ -1,35 +1,380 @@
 {% extends 'base.html' %} 
-{% block title %}Atlas Homepage{% endblock %} 
+{% load static %}
+
+{% block title %}Atlas Homepage{% endblock %}
+
 {% block content %}
-<h1>Homepage</h1>
-<p>This is the content of the child template.</p>
+<style>
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 6rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-<section>
-        <p>
-            ATLAS is an advanced to-do list web application designed to help you
-            <strong>plan smarter, stay focused, and work better together</strong>.
-        </p>
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.4;
+  }
 
-        <p>
-            Unlike traditional task managers, ATLAS goes beyond simple lists.
-            You can estimate task duration, track time with a built-in countdown,
-            and collaborate with others — all in one clean, intuitive interface.
-        </p>
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
 
-        <p>
-            Whether you’re managing personal tasks or coordinating work within a team,
-            ATLAS helps turn plans into progress.
-        </p>
-    </section>
-    <section>
-        <h2>Why ATLAS?</h2>
-        <ul>
-            <li>Plan tasks with realistic time estimates</li>
-            <li>Stay focused with real-time countdown timers</li>
-            <li>Organize work into structured task groups</li>
-            <li>Share and assign tasks with other users</li>
-            <li>Track progress from start to completion</li>
-        </ul>
-    </section>
+  .hero h1 {
+    font-size: 4em;
+    margin-bottom: 1rem;
+    font-weight: 800;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.8s ease-out;
+  }
 
+  .hero-subtitle {
+    font-size: 1.5em;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+    animation: fadeInUp 0.8s ease-out 0.2s backwards;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 2rem;
+    animation: fadeInUp 0.8s ease-out 0.4s backwards;
+    flex-wrap: wrap;
+  }
+
+  .hero-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid white;
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Features Preview Section */
+  .features-preview {
+    padding: 5rem 2rem;
+    background: white;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2.5em;
+    color: #2c3e50;
+    margin-bottom: 3rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    text-align: center;
+    border: 1px solid #f0f0f0;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  }
+
+  .feature-icon {
+    font-size: 3.5em;
+    margin-bottom: 1rem;
+  }
+
+  .feature-card h3 {
+    font-size: 1.5em;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+
+  .feature-card p {
+    color: #6c757d;
+    line-height: 1.6;
+  }
+
+  /* Stats Section */
+  .stats-section {
+    background: linear-gradient(135deg, #3CD4B3 0%, #29a17a 100%);
+    color: white;
+    padding: 4rem 2rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .stat-item h3 {
+    font-size: 3em;
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+  }
+
+  .stat-item p {
+    font-size: 1.2em;
+    opacity: 0.9;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    padding: 5rem 2rem;
+    text-align: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  }
+
+  .cta-section h2 {
+    font-size: 2.5em;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-section p {
+    font-size: 1.2em;
+    color: #6c757d;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    padding: 5rem 2rem;
+    background: white;
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .testimonial-card {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    border-left: 4px solid #3CD4B3;
+  }
+
+  .testimonial-text {
+    font-style: italic;
+    color: #495057;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .testimonial-author {
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .testimonial-role {
+    color: #6c757d;
+    font-size: 0.9em;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 2.5em;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2em;
+    }
+
+    .hero-buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .section-title {
+      font-size: 2em;
+    }
+  }
+</style>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>🚀 ATLAS</h1>
+    <p class="hero-subtitle">Advanced Task List Application System</p>
+    <p style="font-size: 1.2em; margin-bottom: 2rem; opacity: 0.9;">
+      Organize your tasks, track your time, and boost your productivity with intelligent task management.
+    </p>
+    <div class="hero-buttons">
+      <a href="{% url 'users:register' %}" class="hero-btn btn-primary">
+        Get Started Free →
+      </a>
+      <a href="{% url 'public_frontend:features' %}" class="hero-btn btn-secondary">
+        Explore Features
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Features Preview -->
+<section class="features-preview">
+  <h2 class="section-title">Why Choose ATLAS?</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⏱️</div>
+      <h3>Smart Timer</h3>
+      <p>Track time spent on each task automatically. Start, pause, and resume with a single click. Perfect for time tracking and productivity analysis.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📁</div>
+      <h3>Task Groups</h3>
+      <p>Organize tasks into customizable groups. Work, Personal, Study - create categories that match your workflow and filter tasks effortlessly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Priority Management</h3>
+      <p>Set priorities (High, Medium, Low) and never miss important deadlines. Visual color-coding helps you focus on what matters most.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Progress Tracking</h3>
+      <p>Monitor your progress with visual indicators. See completion percentages, time spent, and time remaining at a glance.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>Secure & Private</h3>
+      <p>Your data is yours alone. Bank-level security ensures your tasks and information remain private and protected.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <h3>Responsive Design</h3>
+      <p>Access your tasks anywhere, anytime. Beautiful interface that works seamlessly on desktop, tablet, and mobile devices.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <h3>100%</h3>
+      <p>Free to Use</p>
+    </div>
+    <div class="stat-item">
+      <h3>∞</h3>
+      <p>Unlimited Tasks</p>
+    </div>
+    <div class="stat-item">
+      <h3>⚡</h3>
+      <p>Lightning Fast</p>
+    </div>
+    <div class="stat-item">
+      <h3>🛡️</h3>
+      <p>Secure</p>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials">
+  <h2 class="section-title">What Users Say</h2>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <p class="testimonial-text">
+        "ATLAS transformed how I manage my daily tasks. The timer feature is a game-changer for tracking my productivity!"
+      </p>
+      <div class="testimonial-author">Sarah M.</div>
+      <div class="testimonial-role">Freelance Designer</div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">
+        "Clean interface, powerful features. The task groups help me separate work and personal life effortlessly."
+      </p>
+      <div class="testimonial-author">John D.</div>
+      <div class="testimonial-role">Software Engineer</div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-text">
+        "As a student, ATLAS helps me organize assignments by subject. The priority system ensures I never miss deadlines!"
+      </p>
+      <div class="testimonial-author">Emily R.</div>
+      <div class="testimonial-role">University Student</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <h2>Ready to Get Organized?</h2>
+  <p>Join thousands of users who have transformed their productivity with ATLAS. Start managing your tasks smarter, not harder.</p>
+  <a href="{% url 'users:register' %}" class="hero-btn btn-primary" style="font-size: 1.2em;">
+    Create Free Account →
+  </a>
+</section>
 {% endblock %}
