@@ -15,8 +15,9 @@ try:
   with open(KEYSDIR) as k:
     project_keys: dict = json.loads(k.read())
 except FileNotFoundError:
-  project_keys: dict = { "SECRETKEY": "django-insecure-qds-9^cdaqx0ywku42h&_v_n9sor=w4!z+s-d*wuif&12brx-b", "ENVIRONMENT": "development" }
-  
+  # project_keys: dict = { "SECRETKEY": "django-insecure-qds-9^cdaqx0ywku42h&_v_n9sor=w4!z+s-d*wuif&12brx-b", "ENVIRONMENT": "development" }
+  pass
+
 def get_key(setting,project_keys=project_keys) -> str:
   try:
     return project_keys[setting]

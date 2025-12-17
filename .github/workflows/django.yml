@@ -40,6 +40,10 @@ jobs:
     - name: Install matching ChromeDriver
       run: python install_chromedriver.py
 
+    - name: Create keys.json
+      run: |
+        echo '${{ vars.KEYS_JSON }}' > keys.json
+
     - name: Run Migrations
       run: python manage.py migrate
         
